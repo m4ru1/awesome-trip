@@ -54,7 +54,7 @@ export interface Block {
   status: BlockStatus
   primary: Option
   alternatives: Option[]
-  transportToNext: Transport | null
+  transportToNext: Transport[]
   conflict?: Conflict | null
   _durMin?: number
 }

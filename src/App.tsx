@@ -136,11 +136,12 @@ export default function App() {
     showToast('已切换主选 · 已重算冲突')
   }
 
-  function switchTransport(dayIdx: number, blockIdx: number, altIdx: number) {
+  function switchTransport(dayIdx: number, blockIdx: number, segIdx: number, altIdx: number) {
     mutateDay(dayIdx, day => {
       let blocks = [...day.blocks]
       const b = { ...blocks[blockIdx] }
-      const conn = { ...b.transportToNext! }
+      const chain = [...b.transportToNext]
+      const conn = { ...chain[segIdx] }
       const alts = [...conn.alternatives]
       const oldP = conn.primary
       const newP = alts[altIdx]
@@ -148,7 +149,8 @@ export default function App() {
       alts[altIdx] = oldP
       conn.primary = newP
       conn.alternatives = alts
-      b.transportToNext = conn
+      chain[segIdx] = conn
+      b.transportToNext = chain
       blocks[blockIdx] = b
       blocks = shiftFrom(blocks, blockIdx, delta)
       return { ...day, blocks: flagConflicts(blocks) }
@@ -157,29 +159,33 @@ export default function App() {
   }
 
   /* ── Transport field edits ── */
-  function setTransportMode(dayIdx: number, blockIdx: number, modeKey: string) {
+  function setTransportMode(dayIdx: number, blockIdx: number, segIdx: number, modeKey: string) {
     mutateDay(dayIdx, day => {
       const blocks = [...day.blocks]
       const b = { ...blocks[blockIdx] }
-      if (!b.transportToNext?.primary) return day
-      const conn = { ...b.transportToNext }
+      const chain = [...b.transportToNext]
+      if (!chain[segIdx]?.primary) return day
+      const conn = { ...chain[segIdx] }
       conn.primary = { ...conn.primary, mode: modeKey as TransportMode }
-      b.transportToNext = conn
+      chain[segIdx] = conn
+      b.transportToNext = chain
       blocks[blockIdx] = b
       return { ...day, blocks }
     })
     showToast(`已改走「${(TRANSPORT_META as Record<string, { zh: string }>)[modeKey]?.zh ?? modeKey}」`)
   }
 
-  function setTransportField(dayIdx: number, blockIdx: number, field: string, value: string) {
+  function setTransportField(dayIdx: number, blockIdx: number, segIdx: number, field: string, value: string) {
     mutateDay(dayIdx, day => {
       let blocks = [...day.blocks]
       const b = { ...blocks[blockIdx] }
-      if (!b.transportToNext?.primary) return day
-      const conn = { ...b.transportToNext }
+      const chain = [...b.transportToNext]
+      if (!chain[segIdx]?.primary) return day
+      const conn = { ...chain[segIdx] }
       const oldP = conn.primary
       conn.primary = { ...oldP, [field]: value }
-      b.transportToNext = conn
+      chain[segIdx] = conn
+      b.transportToNext = chain
       blocks[blockIdx] = b
       if (field === 'duration') {
         const delta = parseTransportMin(value) - parseTransportMin(oldP.duration)
@@ -193,7 +199,7 @@ export default function App() {
     mutateDay(dayIdx, day => {
       let blocks = [...day.blocks]
       const b = { ...blocks[blockIdx] }
-      b.transportToNext = { primary: { mode: 'walk', duration: '10min', cost: '免费', distance: '' }, alternatives: [] }
+      b.transportToNext = [...b.transportToNext, { primary: { mode: 'walk', duration: '10min', cost: '免费', distance: '' }, alternatives: [] }]
       blocks[blockIdx] = b
       blocks = shiftFrom(blocks, blockIdx, 10)
       return { ...day, blocks: flagConflicts(blocks) }
@@ -201,13 +207,15 @@ export default function App() {
     showToast('已加一段交通 · 下游时间重算')
   }
 
-  function removeTransport(dayIdx: number, blockIdx: number) {
+  function removeTransport(dayIdx: number, blockIdx: number, segIdx: number) {
     mutateDay(dayIdx, day => {
       let blocks = [...day.blocks]
       const b = { ...blocks[blockIdx] }
-      const old = b.transportToNext?.primary
-      const dur = old ? parseTransportMin(old.duration) : 0
-      b.transportToNext = null
+      const chain = [...b.transportToNext]
+      const removed = chain[segIdx]
+      const dur = removed?.primary ? parseTransportMin(removed.primary.duration) : 0
+      chain.splice(segIdx, 1)
+      b.transportToNext = chain
       blocks[blockIdx] = b
       blocks = shiftFrom(blocks, blockIdx, -dur)
       return { ...day, blocks: flagConflicts(blocks) }
@@ -215,14 +223,29 @@ export default function App() {
     showToast('已移除该段交通')
   }
 
+  function reorderTransportSegments(dayIdx: number, blockIdx: number, fromIdx: number, toIdx: number) {
+    mutateDay(dayIdx, day => {
+      const blocks = [...day.blocks]
+      const b = { ...blocks[blockIdx] }
+      const chain = [...b.transportToNext]
+      const [moved] = chain.splice(fromIdx, 1)
+      chain.splice(toIdx, 0, moved)
+      b.transportToNext = chain
+      blocks[blockIdx] = b
+      return { ...day, blocks: flagConflicts(blocks) }
+    })
+    showToast('已重排交通顺序')
+  }
+
   function bindTransport(d: number, b: number) {
     return {
       editable: mode === 'plan',
-      onSwitchAlt: (i: number) => switchTransport(d, b, i),
-      onSetMode: (k: string) => setTransportMode(d, b, k),
-      onSetField: (f: string, v: string) => setTransportField(d, b, f, v),
+      onSwitchAlt: (segIdx: number, altIdx: number) => switchTransport(d, b, segIdx, altIdx),
+      onSetMode: (segIdx: number, k: string) => setTransportMode(d, b, segIdx, k),
+      onSetField: (segIdx: number, f: string, v: string) => setTransportField(d, b, segIdx, f, v),
       onAdd: () => addTransport(d, b),
-      onRemove: () => removeTransport(d, b),
+      onRemove: (segIdx: number) => removeTransport(d, b, segIdx),
+      onReorder: (fromIdx: number, toIdx: number) => reorderTransportSegments(d, b, fromIdx, toIdx),
     }
   }
 
@@ -282,7 +305,6 @@ export default function App() {
   function onSetPrimary(kind: string, idx: number) {
     if (!open) return
     if (kind === 'alt') setPrimaryAlt(open.dayIdx, open.blockIdx, idx)
-    else if (kind === 'transport') switchTransport(open.dayIdx, open.blockIdx, idx)
   }
 
   function toggleStatus(status: BlockStatus) {
@@ -349,7 +371,7 @@ export default function App() {
     mutateDay(dayIdx, day => {
       const block: Block = {
         id: 'b-' + Date.now(), type: patch.type, startTime: patch.startTime, endTime: patch.endTime,
-        status: 'planned', primary: patch.primary, alternatives: [], transportToNext: null,
+        status: 'planned', primary: patch.primary, alternatives: [], transportToNext: [],
       }
       const blocks = [...day.blocks, block]
       return { ...day, blocks: flagConflicts(sortByStart(blocks)) }

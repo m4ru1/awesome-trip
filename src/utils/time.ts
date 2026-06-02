@@ -33,6 +33,16 @@ export function parseYen(s: string): number {
   return m ? parseInt(m[1], 10) : 0
 }
 
+import type { Transport } from '@/types'
+
+export function totalTransportMin(chain: Transport[]): number {
+  let total = 0
+  for (const seg of chain) {
+    if (seg.primary) total += parseTransportMin(seg.primary.duration)
+  }
+  return total
+}
+
 export function parseOpenHours(s: string): { open: number; close: number } | null {
   if (!s) return null
   const m = String(s).match(/(\d{1,2}:\d{2})\s*[–\-~至]\s*(\d{1,2}:\d{2})/)

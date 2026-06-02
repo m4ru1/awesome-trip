@@ -9,9 +9,10 @@ export function tripTotals(trip: Trip) {
     for (const b of day.blocks) {
       const p = b.primary
       money += parseYen(p.perPersonCost ?? '') + parseYen(p.ticketPrice ?? '') + parseYen(p.pricePerNight ?? '')
-      if (b.transportToNext?.primary) {
-        money += parseYen(b.transportToNext.primary.cost)
-        transportMin += parseTransportMin(b.transportToNext.primary.duration)
+      for (const seg of b.transportToNext) {
+        if (!seg.primary) continue
+        money += parseYen(seg.primary.cost)
+        transportMin += parseTransportMin(seg.primary.duration)
       }
       const s = toMin(b.startTime), e = toMin(b.endTime)
       if (b.type === 'sight' && s != null && e != null) sightMin += e - s

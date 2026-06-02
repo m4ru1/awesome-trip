@@ -9,11 +9,12 @@ import AlternativeDeck from '@/components/panels/AlternativeDeck'
 
 interface TransportHandlers {
   editable: boolean
-  onSwitchAlt: (i: number) => void
-  onSetMode: (k: string) => void
-  onSetField: (f: string, v: string) => void
+  onSwitchAlt: (segIdx: number, altIdx: number) => void
+  onSetMode: (segIdx: number, k: string) => void
+  onSetField: (segIdx: number, f: string, v: string) => void
   onAdd: () => void
-  onRemove: () => void
+  onRemove: (segIdx: number) => void
+  onReorder?: (fromIdx: number, toIdx: number) => void
 }
 
 interface Props {
@@ -185,7 +186,7 @@ export default function DetailContent({
         </div>
 
         {/* Transport connector */}
-        {(block.transportToNext || (transport && transport.editable)) && (
+        {(block.transportToNext.length > 0 || (transport && transport.editable)) && (
           <div style={{ marginTop: 18 }}>
             <div
               style={{
@@ -198,19 +199,15 @@ export default function DetailContent({
               前往下一站
             </div>
             <TransportConnector
-              connector={block.transportToNext!}
+              connectors={block.transportToNext}
               layout="timeline"
               editable={transport ? transport.editable : editable}
-              onSwitchAlt={
-                transport
-                  ? transport.onSwitchAlt
-                  : (i: number) =>
-                      onSetPrimary?.('transport', i)
-              }
+              onSwitchAlt={transport?.onSwitchAlt}
               onSetMode={transport?.onSetMode}
               onSetField={transport?.onSetField}
               onAdd={transport?.onAdd}
               onRemove={transport?.onRemove}
+              onReorder={transport?.onReorder}
             />
           </div>
         )}

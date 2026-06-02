@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react'
-import type { Trip, Mode } from '@/types'
-import { TYPE_META } from '@/data/constants'
+import type { Trip, Mode, TransportMode } from '@/types'
+import { TYPE_META, TRANSPORT_META } from '@/data/constants'
+import { parseTransportMin } from '@/utils/time'
 import BlockCard from '@/components/cards/BlockCard'
 import ExecuteNowCard from '@/components/timeline/ExecuteNowCard'
 
@@ -16,11 +17,11 @@ interface Props {
     blockIdx: number,
   ) => {
     editable: boolean
-    onSwitchAlt: (i: number) => void
-    onSetMode: (k: string) => void
-    onSetField: (f: string, v: string) => void
+    onSwitchAlt: (segIdx: number, altIdx: number) => void
+    onSetMode: (segIdx: number, k: string) => void
+    onSetField: (segIdx: number, f: string, v: string) => void
     onAdd: () => void
-    onRemove: () => void
+    onRemove: (segIdx: number) => void
   }
   nowInfo?: {
     blockIdx: number | null
@@ -32,9 +33,17 @@ interface Props {
 function TransportIndicator({
   transport,
 }: {
-  transport: { primary: { mode: string; duration: string } } | null
+  transport: { primary: { mode: string; duration: string } }[] | null
 }) {
-  if (!transport?.primary) return null
+  if (!transport || transport.length === 0) return null
+  const segments = transport.filter(t => t?.primary)
+  if (segments.length === 0) return null
+
+  const parts = segments.map(t => {
+    const tm = TRANSPORT_META[t.primary.mode as TransportMode] ?? { emoji: '•', zh: '' }
+    return `${tm.emoji} ${t.primary.duration}`
+  })
+  const totalMin = segments.reduce((s, t) => s + parseTransportMin(t.primary.duration), 0)
 
   return (
     <div
@@ -74,7 +83,7 @@ function TransportIndicator({
         }}
       >
         <span className="num" style={{ fontWeight: 600 }}>
-          {transport.primary.duration}
+          {parts.join(' → ')} · {totalMin}min
         </span>
       </div>
     </div>

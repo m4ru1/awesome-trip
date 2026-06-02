@@ -1,5 +1,5 @@
 import type { Block, Day } from '@/types'
-import { toMin, fmt, parseTransportMin, parseOpenHours } from './time'
+import { toMin, fmt, totalTransportMin, parseOpenHours } from './time'
 
 export function withDurations(day: Day): Day {
   return {
@@ -37,8 +37,8 @@ export function recalcDay(day: Day): Day {
         b.conflict = { kind: 'open', msg: `早于开门 ${fmt(oh.open)}` }
     }
 
-    if (b.transportToNext?.primary)
-      cursor += parseTransportMin(b.transportToNext.primary.duration)
+    if (b.transportToNext.length > 0)
+      cursor += totalTransportMin(b.transportToNext)
   }
   return { ...day, blocks }
 }

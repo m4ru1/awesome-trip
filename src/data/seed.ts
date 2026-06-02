@@ -26,10 +26,10 @@ export const SEED_TRIP: Trip = {
             tags: ['必拍', '早去人少', '登山'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'train', cost: '¥150', duration: '12min', distance: '4.2km', note: 'JR奈良线 → 京都站换乘，班次密集' },
             alternatives: [{ mode: 'taxi', cost: '¥1400', duration: '18min', distance: '5km', note: '雨天更省心' }],
-          },
+          }],
         },
         {
           id: 'b1-2', type: 'meal', startTime: '11:45', endTime: '12:45', status: 'done',
@@ -47,10 +47,10 @@ export const SEED_TRIP: Trip = {
               highlight: '人均一百出头，快又稳，省下的钱留给晚餐。', tags: ['平价', '快'], swapReason: 'save',
             }) as any,
           ],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '6min', distance: '450m', note: '穿过新京极商店街' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b1-3', type: 'sight', startTime: '13:30', endTime: '15:30', status: 'planned',
@@ -67,10 +67,10 @@ export const SEED_TRIP: Trip = {
               tags: ['小众', '清净'], swapReason: 'closed',
             }) as any,
           ],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'bus', cost: '¥230', duration: '22min', distance: '5.8km', note: '207路 → 清水道下车' },
             alternatives: [{ mode: 'taxi', cost: '¥1700', duration: '15min', distance: '6km', note: '两人均摊不算贵' }],
-          },
+          }],
         },
         {
           id: 'b1-4', type: 'sight', startTime: '16:10', endTime: '17:40', status: 'planned',
@@ -81,10 +81,10 @@ export const SEED_TRIP: Trip = {
             tags: ['黄昏最美', '必拍', '好逛'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '10min', distance: '750m', note: '沿宁宁之道散步下山' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b1-5', type: 'meal', startTime: '18:30', endTime: '20:00', status: 'planned',
@@ -102,10 +102,10 @@ export const SEED_TRIP: Trip = {
               highlight: '米其林必比登拉面，暖呼呼一碗，预算友好。', tags: ['必比登', '平价'], swapReason: 'save',
             }) as any,
           ],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'taxi', cost: '¥1200', duration: '10min', distance: '3km', note: '夜间走路也行，约 25 分钟' },
             alternatives: [{ mode: 'walk', cost: '免费', duration: '25min', distance: '2km', note: '沿鸭川夜色散步' }],
-          },
+          }],
         },
         {
           id: 'b1-6', type: 'rest', startTime: '20:30', endTime: '次日', status: 'planned',
@@ -117,7 +117,7 @@ export const SEED_TRIP: Trip = {
             tags: ['町家', '近鸭川'],
           }) as any,
           alternatives: [],
-          transportToNext: null,
+          transportToNext: [],
         },
       ],
     },
@@ -139,10 +139,10 @@ export const SEED_TRIP: Trip = {
               tags: ['室内', '看河景'], swapReason: 'rain',
             }) as any,
           ],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '8min', distance: '600m', note: '竹林尽头即天龙寺北门' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b2-2', type: 'sight', startTime: '11:15', endTime: '12:30', status: 'planned',
@@ -153,10 +153,10 @@ export const SEED_TRIP: Trip = {
             tags: ['世界遗产', '庭园'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '5min', distance: '350m', note: '门口就是嵯峨豆腐街' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b2-3', type: 'meal', startTime: '12:45', endTime: '13:45', status: 'planned',
@@ -168,10 +168,10 @@ export const SEED_TRIP: Trip = {
             tags: ['暖食', '雨天友好'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'train', cost: '¥240', duration: '30min', distance: '9km', note: '嵯峨岚山站 → 圆町，换巴士' },
             alternatives: [{ mode: 'taxi', cost: '¥2600', duration: '22min', distance: '11km', note: '雨天直达更舒服' }],
-          },
+          }],
         },
         {
           id: 'b2-4', type: 'sight', startTime: '14:30', endTime: '16:30', status: 'planned',
@@ -188,10 +188,10 @@ export const SEED_TRIP: Trip = {
               tags: ['室内', '看展'], swapReason: 'rain',
             }) as any,
           ],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'bus', cost: '¥230', duration: '35min', distance: '7km', note: '市巴士 → 四条河原町，可能拥挤' },
             alternatives: [{ mode: 'subway', cost: '¥260', duration: '28min', distance: '8km', note: '地铁更准时' }],
-          },
+          }],
         },
         {
           id: 'b2-5', type: 'free', startTime: '17:00', endTime: '18:15', status: 'planned',
@@ -202,10 +202,10 @@ export const SEED_TRIP: Trip = {
             tags: ['小吃', '好逛', '有顶棚'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '7min', distance: '500m', note: '走到先斗町一带' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b2-6', type: 'meal', startTime: '19:00', endTime: '20:30', status: 'planned',
@@ -217,10 +217,10 @@ export const SEED_TRIP: Trip = {
             tags: ['夜景', '气氛好'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '9min', distance: '700m', note: '沿木屋町回旅宿' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b2-7', type: 'rest', startTime: '20:40', endTime: '次日', status: 'planned',
@@ -231,7 +231,7 @@ export const SEED_TRIP: Trip = {
             highlight: '连住第二晚，熟门熟路。', tags: ['连住'],
           }) as any,
           alternatives: [],
-          transportToNext: null,
+          transportToNext: [],
         },
       ],
     },
@@ -253,10 +253,10 @@ export const SEED_TRIP: Trip = {
               tags: ['省时', '近市区'], swapReason: 'time',
             }) as any,
           ],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'bus', cost: '¥390', duration: '45min', distance: '16km', note: '大原 → 出町柳，山路班次较少' },
             alternatives: [{ mode: 'taxi', cost: '¥4200', duration: '32min', distance: '17km', note: '山路打车偏贵' }],
-          },
+          }],
         },
         {
           id: 'b3-2', type: 'meal', startTime: '12:30', endTime: '13:30', status: 'planned',
@@ -267,10 +267,10 @@ export const SEED_TRIP: Trip = {
             highlight: '百年豆饼现买现吃，配一碗茶解腻。', tags: ['排队名物', '平价'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '12min', distance: '900m', note: '过鸭川三角洲跳石' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b3-3', type: 'sight', startTime: '14:00', endTime: '16:00', status: 'planned',
@@ -281,10 +281,10 @@ export const SEED_TRIP: Trip = {
             tags: ['散步', '赏枫', '拍照'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '30min', distance: '2km', note: '哲学之道散步过去' },
             alternatives: [{ mode: 'bus', cost: '¥230', duration: '12min', distance: '2.5km', note: '脚累就坐车' }],
-          },
+          }],
         },
         {
           id: 'b3-4', type: 'sight', startTime: '16:40', endTime: '17:40', status: 'planned',
@@ -295,10 +295,10 @@ export const SEED_TRIP: Trip = {
             tags: ['免费', '复古', '必拍'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'subway', cost: '¥220', duration: '15min', distance: '3.5km', note: '蹴上站 → 三条' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b3-5', type: 'meal', startTime: '18:30', endTime: '20:00', status: 'planned',
@@ -309,10 +309,10 @@ export const SEED_TRIP: Trip = {
             highlight: '自己动手铁板上煎，热热闹闹收尾这一天。', tags: ['热闹', '自助煎'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '10min', distance: '750m', note: '散步回旅宿' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b3-6', type: 'rest', startTime: '20:10', endTime: '次日', status: 'planned',
@@ -321,7 +321,7 @@ export const SEED_TRIP: Trip = {
             checkIn: '15:00', checkOut: '11:00', amenities: ['近鸭川', '榻榻米'], highlight: '连住第三晚。', tags: ['连住'],
           }) as any,
           alternatives: [],
-          transportToNext: null,
+          transportToNext: [],
         },
       ],
     },
@@ -343,10 +343,10 @@ export const SEED_TRIP: Trip = {
               tags: ['免费', '备用'], swapReason: 'closed',
             }) as any,
           ],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'subway', cost: '¥260', duration: '18min', distance: '5km', note: '东西线 → 乌丸御池换乘' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b4-2', type: 'meal', startTime: '11:30', endTime: '12:30', status: 'planned',
@@ -357,10 +357,10 @@ export const SEED_TRIP: Trip = {
             highlight: '一格格小钵的京都家常味，清爽不贵。', tags: ['健康', '平价'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'train', cost: '¥410', duration: '40min', distance: '15km', note: 'JR → 宇治站' },
             alternatives: [{ mode: 'taxi', cost: '¥4800', duration: '30min', distance: '17km', note: '太贵，不推荐' }],
-          },
+          }],
         },
         {
           id: 'b4-3', type: 'sight', startTime: '13:30', endTime: '16:00', status: 'planned',
@@ -371,10 +371,10 @@ export const SEED_TRIP: Trip = {
             tags: ['世界遗产', '抹茶', '出片'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'train', cost: '¥410', duration: '40min', distance: '15km', note: 'JR 宇治 → 京都站' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b4-4', type: 'meal', startTime: '17:30', endTime: '19:00', status: 'planned',
@@ -385,10 +385,10 @@ export const SEED_TRIP: Trip = {
             highlight: '全日本人气拉面集合，配站顶夜景刚刚好。', tags: ['夜景', '方便'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '8min', distance: '500m', note: '站内步行到空中走廊' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b4-5', type: 'free', startTime: '19:15', endTime: '20:15', status: 'planned',
@@ -398,10 +398,10 @@ export const SEED_TRIP: Trip = {
             highlight: '登塔俯瞰夜色，给古都之行收个干净的尾。', tags: ['夜景', '登高'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '12min', distance: '900m', note: '走回旅宿收行李' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b4-6', type: 'rest', startTime: '20:30', endTime: '次日', status: 'planned',
@@ -410,7 +410,7 @@ export const SEED_TRIP: Trip = {
             checkIn: '15:00', checkOut: '11:00', amenities: ['近鸭川', '榻榻米', '近京都站'], highlight: '最后一晚，收拾行李。', tags: ['连住'],
           }) as any,
           alternatives: [],
-          transportToNext: null,
+          transportToNext: [],
         },
       ],
     },
@@ -425,10 +425,10 @@ export const SEED_TRIP: Trip = {
             amenities: ['前台寄存', '整理战利品'], highlight: '把行李寄前台，轻装逛最后半天。', tags: ['退房'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'subway', cost: '¥220', duration: '12min', distance: '3km', note: '乌丸线 → 今出川' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b5-2', type: 'free', startTime: '10:00', endTime: '11:30', status: 'planned',
@@ -438,10 +438,10 @@ export const SEED_TRIP: Trip = {
             highlight: '百年茶铺挑抹茶礼盒，文具杂货街扫最后的手信。', tags: ['手信', '茶叶', '文具'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'walk', cost: '免费', duration: '10min', distance: '750m', note: '走到二条城旁咖啡馆' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b5-3', type: 'meal', startTime: '11:45', endTime: '12:45', status: 'planned',
@@ -452,10 +452,10 @@ export const SEED_TRIP: Trip = {
             highlight: '临行前一杯京都名物咖啡，慢慢告别。', tags: ['人气', '出片'],
           }) as any,
           alternatives: [],
-          transportToNext: {
+          transportToNext: [{
             primary: { mode: 'taxi', cost: '¥1300', duration: '12min', distance: '3.5km', note: '回旅宿取行李' },
             alternatives: [],
-          },
+          }],
         },
         {
           id: 'b5-4', type: 'transport', startTime: '13:30', endTime: '14:30', status: 'planned',
@@ -465,7 +465,7 @@ export const SEED_TRIP: Trip = {
             highlight: '搭 Haruka 特急直达关西机场，京都的秋天到此结束。', tags: ['返程', '需提前购票'],
           }) as any,
           alternatives: [],
-          transportToNext: null,
+          transportToNext: [],
         },
       ],
     },

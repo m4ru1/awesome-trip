@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import type { Trip } from '@/types'
-import { TYPE_META, SCENARIO_META } from '@/data/constants'
+import { TYPE_META, SCENARIO_META, TRANSPORT_META } from '@/data/constants'
 import { tripTotals } from '@/utils/totals'
+import { parseTransportMin } from '@/utils/time'
 import ImageTile from '@/components/ui/ImageTile'
 import TypeTag from '@/components/ui/TypeTag'
 
@@ -82,11 +83,18 @@ export default function ShareView({ trip }: Props) {
                         )}
                       </div>
                     </div>
-                    {b.transportToNext?.primary && (
-                      <div className="mx-auto my-1 flex items-center gap-1.5 text-[11px] text-ink2">
-                        <span className="text-ink3">- -</span> {b.transportToNext.primary.duration} · {b.transportToNext.primary.cost}
-                      </div>
-                    )}
+                    {b.transportToNext.length > 0 && (() => {
+                      const segs = b.transportToNext.filter(t => t?.primary)
+                      if (segs.length === 0) return null
+                      const label = segs.length === 1
+                        ? `${segs[0].primary.duration} · ${segs[0].primary.cost}`
+                        : `${segs.map(t => (TRANSPORT_META[t.primary.mode] ?? { emoji: '•' }).emoji).join('→')} ${segs.reduce((s, t) => s + parseTransportMin(t.primary.duration), 0)}min`
+                      return (
+                        <div className="mx-auto my-1 flex items-center gap-1.5 text-[11px] text-ink2">
+                          <span className="text-ink3">- -</span> {label}
+                        </div>
+                      )
+                    })()}
                   </div>
                 )
               })}

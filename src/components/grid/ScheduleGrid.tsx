@@ -392,44 +392,93 @@ export default function ScheduleGrid({
                     style={{ height: '100%', overflow: 'hidden' }}
                   />
 
-                  {/* transport chip between blocks */}
-                  {b.transportToNext && b.transportToNext.primary && (
-                    <div
-                      style={{
-                        position: 'absolute' as const,
-                        left: 0,
-                        right: 0,
-                        bottom: -13,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        zIndex: 6,
-                      }}
-                    >
-                      <button
-                        title="点开改交通"
-                        onClick={e => {
-                          e.stopPropagation()
-                          onOpenBlock(di, bi)
-                        }}
-                        className="num"
+                  {/* transport chip(s) between blocks */}
+                  {b.transportToNext.length > 0 && (() => {
+                    const segments = b.transportToNext.filter(t => t && t.primary)
+                    if (segments.length === 0) return null
+
+                    const pillStyle = {
+                      background: '#fff',
+                      color: 'var(--c-transport)',
+                      fontSize: 10,
+                      fontWeight: 700 as const,
+                      cursor: 'pointer',
+                      padding: '1px 7px',
+                      borderRadius: 99,
+                      boxShadow: '0 1px 5px rgba(76,125,255,.18)',
+                      border: '1px solid rgba(76,125,255,.2)',
+                      whiteSpace: 'nowrap' as const,
+                    }
+
+                    // Single segment: simple centered pill
+                    if (segments.length === 1) {
+                      const tm = TRANSPORT_META[segments[0].primary.mode] ?? { emoji: '•', zh: '' }
+                      return (
+                        <div
+                          style={{
+                            position: 'absolute' as const,
+                            left: 0,
+                            right: 0,
+                            bottom: -13,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            zIndex: 6,
+                          }}
+                        >
+                          <button
+                            title="点开改交通"
+                            onClick={e => { e.stopPropagation(); onOpenBlock(di, bi) }}
+                            className="num"
+                            style={pillStyle}
+                          >
+                            {tm.emoji} {tm.zh} {segments[0].primary.duration}
+                          </button>
+                        </div>
+                      )
+                    }
+
+                    // Multi-segment: vertical stack with dotted connectors
+                    return (
+                      <div
                         style={{
-                          background: '#fff',
-                          color: 'var(--c-transport)',
-                          fontSize: 10.5,
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          padding: '2px 9px',
-                          borderRadius: 99,
-                          boxShadow: '0 2px 7px rgba(76,125,255,.22)',
-                          border: '1px solid rgba(76,125,255,.2)',
+                          position: 'absolute' as const,
+                          left: 0,
+                          right: 0,
+                          bottom: -11,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          zIndex: 6,
                         }}
                       >
-                        {(TRANSPORT_META[b.transportToNext.primary.mode] ?? { emoji: '•', zh: '' }).emoji}{' '}
-                        {(TRANSPORT_META[b.transportToNext.primary.mode] ?? { zh: '' }).zh}{' '}
-                        {b.transportToNext.primary.duration}
-                      </button>
-                    </div>
-                  )}
+                        {segments.map((t, i) => {
+                          const tm = TRANSPORT_META[t.primary.mode] ?? { emoji: '•' }
+                          return (
+                            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                              {i > 0 && (
+                                <div
+                                  style={{
+                                    width: 0,
+                                    height: 2,
+                                    borderLeft: '1.5px dotted var(--c-transport)',
+                                    opacity: 0.4,
+                                  }}
+                                />
+                              )}
+                              <button
+                                title={`${tm.emoji} ${t.primary.duration}`}
+                                onClick={e => { e.stopPropagation(); onOpenBlock(di, bi) }}
+                                className="num"
+                                style={pillStyle}
+                              >
+                                {tm.emoji} {t.primary.duration}
+                              </button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
                 </div>
               )
             })}

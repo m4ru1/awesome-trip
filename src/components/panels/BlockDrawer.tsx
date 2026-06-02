@@ -4,11 +4,12 @@ import DetailContent from '@/components/panels/DetailContent'
 
 interface TransportHandlers {
   editable: boolean
-  onSwitchAlt: (i: number) => void
-  onSetMode: (k: string) => void
-  onSetField: (f: string, v: string) => void
+  onSwitchAlt: (segIdx: number, altIdx: number) => void
+  onSetMode: (segIdx: number, k: string) => void
+  onSetField: (segIdx: number, f: string, v: string) => void
   onAdd: () => void
-  onRemove: () => void
+  onRemove: (segIdx: number) => void
+  onReorder?: (fromIdx: number, toIdx: number) => void
 }
 
 interface Props {
