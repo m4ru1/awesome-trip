@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { useAnimation } from '@/hooks/useAnimation'
+import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
 import type { Trip } from '@/types'
 
 interface Props {
@@ -23,6 +25,8 @@ function tripSummary(t: Trip): string {
 
 export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTrip, onForkTemplate, onDuplicateTrip }: Props): ReactNode {
   const [deleting, setDeleting] = useState<string | null>(null)
+  const { enabled, toggle } = useAnimation()
+  const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
 
   return (
     <div className="flex h-full flex-col">
@@ -33,6 +37,16 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
         <span className="text-2xl">{'✈️'}</span>
         <span className="title-cn flex-1 text-[22px] font-extrabold text-ink">我的旅行</span>
         <button
+          onClick={toggle}
+          className="btn btn-ghost h-9 !px-2.5 text-sm flex items-center justify-center gap-1"
+          title={enabled ? '动效已开启，点击关闭' : '动效已关闭，点击开启'}
+        >
+          ✨
+          <span style={{ fontSize: 10, fontWeight: 700, opacity: enabled ? 1 : 0.4 }}>
+            {enabled ? 'ON' : 'OFF'}
+          </span>
+        </button>
+        <button
           onClick={onCreateTrip}
           className="rounded-2xl px-4 py-2 text-sm font-bold text-white"
           style={{ background: 'linear-gradient(135deg, #FF8A4C, #FF6B5C)', boxShadow: '0 6px 14px rgba(255,107,92,.3)' }}
@@ -41,7 +55,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
         </button>
       </div>
 
-      <div className="overflow-y-auto p-5">
+      <motion.div ref={rubberRef} className="overscroll-none overflow-y-auto p-5" style={{ y: rubberY }}>
         {trips.length === 0 ? (
           <div className="flex flex-col items-center py-12">
             <div className="mb-4 text-6xl">{'🗺️'}</div>
@@ -108,15 +122,12 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
         >
           <AnimatePresence initial={false}>
           {trips.map((t, i) => (
-            <motion.div
+            <motion.button
               key={t.id}
-              layout
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ duration: 0.3, delay: i * 0.06, ease: 'easeOut' }}
-            >
-            <button
+              exit={enabled ? { scale: 0.9, opacity: 0 } : { opacity: 0 }}
+              transition={enabled ? { duration: 0.3, delay: i * 0.06, ease: 'easeOut' } : { duration: 0 }}
               onClick={() => onSelectTrip(t.id)}
               style={{
                 position: 'relative',
@@ -127,17 +138,16 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
                 cursor: 'pointer',
                 textAlign: 'left',
                 boxShadow: 'var(--shadow-soft)',
-                transition: 'all .2s var(--ease-spring)',
+                transition: 'border-color .2s, box-shadow .2s',
+                width: '100%',
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.borderColor = 'var(--color-brand)'
                 e.currentTarget.style.boxShadow = 'var(--shadow-pop)'
-                e.currentTarget.style.transform = 'translateY(-2px)'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = 'var(--color-line)'
                 e.currentTarget.style.boxShadow = 'var(--shadow-soft)'
-                e.currentTarget.style.transform = ''
               }}
             >
               <span
@@ -248,8 +258,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
                   </>
                 )}
               </div>
-            </button>
-            </motion.div>
+            </motion.button>
           ))}
           </AnimatePresence>
 
@@ -283,7 +292,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
           </button>
         </motion.div>
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }

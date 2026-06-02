@@ -1,5 +1,7 @@
 import { useState, useCallback, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { useAnimation } from '@/hooks/useAnimation'
+import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
 import type { Trip, Mode } from '@/types'
 import { SCALE, TRANSPORT_META } from '@/data/constants'
 import { toMin } from '@/utils/time'
@@ -50,6 +52,8 @@ export default function ScheduleGrid({
   onDayHeaderClick,
   nowInfo,
 }: Props): ReactNode {
+  const { tr: animTr } = useAnimation()
+  const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
   const { start: rangeStart, end: rangeEnd } = computeRange(trip)
   const totalMin = rangeEnd - rangeStart
   const height = totalMin * SCALE
@@ -113,7 +117,11 @@ export default function ScheduleGrid({
   const gridMinWidth = 58 + trip.days.length * 200 + (editable ? 66 : 0)
 
   return (
-    <div style={{ height: '100%', overflow: 'auto', padding: '0 18px 24px' }}>
+    <motion.div
+      ref={rubberRef}
+      className="overscroll-none"
+      style={{ height: '100%', overflow: 'auto', padding: '0 18px 24px', y: rubberY }}
+    >
       <div
         style={{
           display: 'grid',
@@ -371,7 +379,7 @@ export default function ScheduleGrid({
                   initial={{ opacity: 0, scale: 0.85 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.85 }}
-                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  transition={animTr({ duration: 0.2, ease: 'easeOut' })}
                   style={{
                     position: 'absolute' as const,
                     top,
@@ -554,6 +562,6 @@ export default function ScheduleGrid({
         {/* placeholder cell for add-day column body (keep grid alignment) */}
         {editable && <div style={{ height }} />}
       </div>
-    </div>
+    </motion.div>
   )
 }

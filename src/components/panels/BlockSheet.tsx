@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
+import { useAnimation } from '@/hooks/useAnimation'
 import type { Block, Mode, BlockStatus } from '@/types'
 import DetailContent from '@/components/panels/DetailContent'
 
@@ -40,6 +41,7 @@ export default function BlockSheet({
   onDelete,
   transport,
 }: Props): ReactNode {
+  const { enabled, tr: animTr } = useAnimation()
   return (
     <AnimatePresence>
       <>
@@ -49,7 +51,7 @@ export default function BlockSheet({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={animTr({ duration: 0.2 })}
           onClick={onClose}
           style={{
             position: 'absolute',
@@ -64,7 +66,7 @@ export default function BlockSheet({
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
-          transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 1 }}
+          transition={enabled ? { type: 'spring', stiffness: 400, damping: 30, mass: 1 } : { duration: 0 }}
           style={{
             position: 'absolute',
             left: 0,
@@ -76,6 +78,7 @@ export default function BlockSheet({
             borderTopLeftRadius: 24,
             borderTopRightRadius: 24,
             overflowY: 'auto',
+            overscrollBehaviorY: 'contain',
             boxShadow: '0 -12px 40px rgba(75,55,40,.22)',
           }}
         >

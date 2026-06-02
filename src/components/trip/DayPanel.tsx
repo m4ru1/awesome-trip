@@ -121,7 +121,7 @@ export default function DayPanel({ dayIdx, day, isMobile, onClose, onUpdate, onD
     return (
       <>
         <div className="absolute inset-0 z-40" style={{ background: 'rgba(43,45,51,.32)' }} onClick={onClose} />
-        <div className="absolute inset-x-0 bottom-0 z-41 max-h-[92%] overflow-y-auto rounded-t-3xl bg-white" style={{ boxShadow: '0 -12px 40px rgba(75,55,40,.22)', animation: 'sheetIn .34s var(--ease-spring)' }}>
+        <div className="overscroll-contain absolute inset-x-0 bottom-0 z-41 max-h-[92%] overflow-y-auto rounded-t-3xl bg-white" style={{ boxShadow: '0 -12px 40px rgba(75,55,40,.22)', animation: 'sheetIn .34s var(--ease-spring)' }}>
           <div className="flex justify-center pt-2 pb-0"><div className="h-[5px] w-10 rounded-full bg-black/12" /></div>
           {content}
         </div>
@@ -152,6 +152,7 @@ export default function DayPanel({ dayIdx, day, isMobile, onClose, onUpdate, onD
           maxWidth: '90%',
           maxHeight: '90%',
           overflowY: 'auto',
+          overscrollBehaviorY: 'contain',
           boxShadow: 'var(--shadow-pop)',
           animation: 'floatIn .32s var(--ease-spring)',
         }}

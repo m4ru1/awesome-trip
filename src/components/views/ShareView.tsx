@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react'
+import { motion } from 'motion/react'
+import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
 import type { Trip } from '@/types'
 import { TYPE_META, SCENARIO_META, TRANSPORT_META } from '@/data/constants'
 import { tripTotals } from '@/utils/totals'
@@ -9,12 +11,13 @@ import TypeTag from '@/components/ui/TypeTag'
 interface Props { trip: Trip }
 
 export default function ShareView({ trip }: Props) {
+  const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
   const totals = useMemo(() => tripTotals(trip), [trip])
   const [showAlts, setShowAlts] = useState(false)
   const [copied, setCopied] = useState(false)
 
   return (
-    <div className="h-full overflow-y-auto bg-paper2">
+    <motion.div ref={rubberRef} className="overscroll-none h-full overflow-y-auto bg-paper2" style={{ y: rubberY }}>
       {/* Action bar */}
       <div className="sticky top-0 z-5 flex flex-wrap justify-center gap-2 bg-[rgba(251,239,226,.86)] p-3" style={{ backdropFilter: 'blur(8px)' }}>
         <button className="btn btn-primary" onClick={() => { setCopied(true); setTimeout(() => setCopied(false), 1600) }}>
@@ -109,6 +112,6 @@ export default function ShareView({ trip }: Props) {
           <div className="mt-0.5 text-xs">TRAVEL TIMETABLE · 旅行课程表</div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

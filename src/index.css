@@ -146,6 +146,15 @@ body.tl-dragging { user-select: none; -webkit-user-select: none; cursor: grabbin
   contain-intrinsic-size: 0 72px;
 }
 
+/* ─── Global animation toggle (set by JS on <html>) ─── */
+.animations-off *,
+.animations-off *::before,
+.animations-off *::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+}
+
 /* ─── Accessibility: reduced motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -154,6 +163,10 @@ body.tl-dragging { user-select: none; -webkit-user-select: none; cursor: grabbin
     transition-duration: .01ms !important;
   }
 }
+
+/* ─── Overscroll ─── */
+.overscroll-none { overscroll-behavior-y: none; }
+.overscroll-contain { overscroll-behavior-y: contain; }
 
 /* Drag & Drop */
 .dragging { opacity: .5; }

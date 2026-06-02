@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import type { Mode, Block, Day, BlockType, BlockStatus, SwapReason, TransportMode } from '@/types'
 import { SCENARIO_META, TRANSPORT_META } from '@/data/constants'
+import { useAnimation } from '@/hooks/useAnimation'
 import { cloneTrip, forkTrip } from '@/utils/clone'
 import { SEED_TRIP } from '@/data/seed'
 import { toMin, parseTransportMin } from '@/utils/time'
@@ -29,6 +30,7 @@ import TripCreateDialog from '@/components/home/TripCreateDialog'
 
 export default function App() {
   const { trips, activeTripId, setActiveTrip, saveTrip, createTrip, deleteTrip, getTrip } = useTripLibrary()
+  const { tr: animTr } = useAnimation()
 
   const initialTrip = useMemo(() => {
     const found = getTrip(activeTripId) ?? trips[0]
@@ -607,7 +609,7 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={animTr({ duration: 0.2, ease: 'easeOut' })}
           >
           <PlanBView trip={trip} baselineTrip={baseline} baselineTotals={baselineTotals}
             onApplyScenario={applyScenario} onSetPrimaryAt={setPrimaryAtGlobal} onReset={resetPlan} />
@@ -617,7 +619,7 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={animTr({ duration: 0.2, ease: 'easeOut' })}
           >
           <ShareView trip={trip} />
           </motion.div>
@@ -626,7 +628,7 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={animTr({ duration: 0.2, ease: 'easeOut' })}
           >
           <ScheduleGrid trip={trip} mode={mode}
             onOpenBlock={(d, b) => setOpen({ dayIdx: d, blockIdx: b })}
@@ -638,7 +640,7 @@ export default function App() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={animTr({ duration: 0.2, ease: 'easeOut' })}
           >
             <DayTabs trip={trip} activeIdx={activeDay} onPick={setActiveDay}
               onAddDay={mode === 'plan' ? addDay : undefined}

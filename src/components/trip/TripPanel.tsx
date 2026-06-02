@@ -37,7 +37,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
         <button onClick={onClose} className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-white/30 text-white">✕</button>
       </div>
 
-      <div className="overflow-y-auto px-5 py-4">
+      <div className="overscroll-contain overflow-y-auto px-5 py-4">
         {/* Trip switcher */}
         {allTrips && allTrips.length > 1 && (
           <div className="mb-4">
@@ -184,7 +184,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
     return (
       <>
         <div className="absolute inset-0 z-40" style={{ background: 'rgba(43,45,51,.32)' }} onClick={onClose} />
-        <div className="absolute inset-x-0 bottom-0 z-41 max-h-[92%] overflow-y-auto rounded-t-3xl bg-white" style={{ boxShadow: '0 -12px 40px rgba(75,55,40,.22)', animation: 'sheetIn .34s var(--ease-spring)' }}>
+        <div className="overscroll-contain absolute inset-x-0 bottom-0 z-41 max-h-[92%] overflow-y-auto rounded-t-3xl bg-white" style={{ boxShadow: '0 -12px 40px rgba(75,55,40,.22)', animation: 'sheetIn .34s var(--ease-spring)' }}>
           <div className="flex justify-center pt-2 pb-0"><div className="h-[5px] w-10 rounded-full bg-black/12" /></div>
           {content}
         </div>
@@ -195,7 +195,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
   return (
     <>
       <div className="absolute inset-0 z-40" style={{ background: 'rgba(43,45,51,.28)', animation: 'fadeIn .2s ease' }} onClick={onClose} />
-      <div className="absolute inset-y-0 right-0 z-41 w-[440px] max-w-[92vw] overflow-y-auto bg-white" style={{ boxShadow: '-12px 0 40px rgba(75,55,40,.2)', animation: 'drawerIn .34s var(--ease-spring)' }}>
+      <div className="overscroll-contain absolute inset-y-0 right-0 z-41 w-[440px] max-w-[92vw] overflow-y-auto bg-white" style={{ boxShadow: '-12px 0 40px rgba(75,55,40,.2)', animation: 'drawerIn .34s var(--ease-spring)' }}>
         {content}
       </div>
     </>

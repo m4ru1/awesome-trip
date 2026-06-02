@@ -1,7 +1,5 @@
-import { motion } from 'motion/react'
 import ModeSwitcher from './ModeSwitcher'
 import ExecuteBar from './ExecuteBar'
-import { useAnimation } from '@/hooks/useAnimation'
 import type { Trip, Mode } from '@/types'
 
 interface Props {
@@ -25,8 +23,6 @@ export default function TopBar({
   onSetMode, onTogglePlanB, onShowHelp, onShowTrip, onGoHome,
   activeDay, onSetActiveDay, onSetNowMin,
 }: Props) {
-  const { enabled, toggle } = useAnimation()
-
   return (
     <header
       className="z-50 flex flex-col border-b border-line"
@@ -81,17 +77,6 @@ export default function TopBar({
         >
           ?
         </button>
-        <motion.button
-          onClick={toggle}
-          whileTap={{ scale: 0.9 }}
-          className="btn btn-ghost h-9 !px-2.5 text-sm flex items-center justify-center gap-1"
-          title={enabled ? '动效已开启，点击关闭' : '动效已关闭，点击开启'}
-        >
-          {enabled ? '✨' : '✨'}
-          <span style={{ fontSize: 10, fontWeight: 700, opacity: enabled ? 1 : 0.4 }}>
-            {enabled ? 'ON' : 'OFF'}
-          </span>
-        </motion.button>
         <button
           onClick={onTogglePlanB}
           className="btn text-[13px]"

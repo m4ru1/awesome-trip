@@ -1,5 +1,6 @@
 import type { ReactNode, CSSProperties } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { useAnimation } from '@/hooks/useAnimation'
 import type { Block, Mode } from '@/types'
 import { TYPE_META } from '@/data/constants'
 import TagRow from '@/components/ui/TagRow'
@@ -27,6 +28,7 @@ export default function BlockCard({
   className = '',
   availableHeight,
 }: Props): ReactNode {
+  const { enabled } = useAnimation()
   const meta = TYPE_META[block.type]
   const p = block.primary
   const altN = (block.alternatives ?? []).length
@@ -222,7 +224,7 @@ export default function BlockCard({
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
           exit={{ scale: 0 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+          transition={enabled ? { type: 'spring', stiffness: 500, damping: 25 } : { duration: 0 }}
           style={{
             position: 'absolute',
             top: -8,

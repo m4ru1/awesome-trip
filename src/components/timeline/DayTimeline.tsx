@@ -1,5 +1,7 @@
 import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react'
 import { motion } from 'motion/react'
+import { useAnimation } from '@/hooks/useAnimation'
+import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
 import type { Trip, Mode, TransportMode } from '@/types'
 import { TYPE_META, TRANSPORT_META } from '@/data/constants'
 import { parseTransportMin } from '@/utils/time'
@@ -101,6 +103,8 @@ export default function DayTimeline({
   transportBinder: _transportBinder,
   nowInfo,
 }: Props): ReactNode {
+  const { enabled } = useAnimation()
+  const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
   const day = trip.days[activeIdx]
   if (!day) return null
 
@@ -214,12 +218,15 @@ export default function DayTimeline({
     : (d: number, b: number) => onOpenBlock(d, b)
 
   return (
-    <div
+    <motion.div
+      ref={rubberRef}
+      className="overscroll-none"
       style={{
         height: '100%',
         overflowY: 'auto',
         paddingBottom: 30,
         position: 'relative',
+        y: rubberY,
       }}
     >
       {/* Execute mode: "Now" card at the top */}
@@ -267,8 +274,8 @@ export default function DayTimeline({
             <motion.div
               key={b.id}
               ref={el => { rowRefs.current[realIdx] = el }}
-              layout
-              transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 1 }}
+              layout={enabled}
+              transition={enabled ? { type: 'spring', stiffness: 400, damping: 30, mass: 1 } : { duration: 0 }}
               style={{
                 transition: isDragging ? 'none' : 'transform .22s var(--ease-spring)',
                 transform: translateY ? `translateY(${translateY}px)` : undefined,
@@ -409,6 +416,6 @@ export default function DayTimeline({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

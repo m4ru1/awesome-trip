@@ -102,7 +102,7 @@ export default function BlockEditor({ kind, variant, blockType, initial, default
         </div>
 
         {/* Form body */}
-        <div className="overflow-y-auto px-5 py-4">
+        <div className="overscroll-contain overflow-y-auto px-5 py-4">
           {/* Scenario reason (alt only) */}
           {isAlt && (
             <EdField label="什么情况下换它" hint="会显示成彩色标签，也能在 Plan B 里成套切换">
