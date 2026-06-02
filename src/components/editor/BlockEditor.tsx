@@ -3,6 +3,8 @@ import type { BlockType, Option, SwapReason } from '@/types'
 import { TYPE_META, SCENARIO_META } from '@/data/constants'
 import EdField from '@/components/ui/EdField'
 import EdInput from '@/components/ui/EdInput'
+import EmojiPicker from '@/components/ui/EmojiPicker'
+import NumberSpinner from '@/components/ui/NumberSpinner'
 import { toMin, fmt } from '@/utils/time'
 
 interface Props {
@@ -140,8 +142,7 @@ export default function BlockEditor({ kind, variant, blockType, initial, default
           {/* Emoji + Name */}
           <EdField label="名称" hint="必填">
             <div className="flex gap-2">
-              <EdInput value={p.emoji || ''} onChange={v => up('emoji', v)} placeholder={m.emoji}
-                style={{ width: 58, flexShrink: 0, textAlign: 'center', fontSize: 20, padding: '8px 0' } as React.CSSProperties} />
+              <EmojiPicker value={p.emoji || ''} onChange={v => up('emoji', v)} placeholder={m.emoji} />
               <EdInput value={p.name || ''} onChange={v => up('name', v)} placeholder="例如：清水寺 + 二三年坂" />
             </div>
             {tried && !nameOk && <div className="mt-1.5 text-[11.5px] font-bold text-brand">请填写名称</div>}
@@ -207,8 +208,7 @@ export default function BlockEditor({ kind, variant, blockType, initial, default
             <div className="grid grid-cols-2 gap-3">
               <EdField label="每晚价" hint="选填"><EdInput value={p.pricePerNight || ''} onChange={v => up('pricePerNight', v)} placeholder="¥2,400" /></EdField>
               <EdField label="评分" hint="选填">
-                <input type="number" step="0.1" min="0" max="5" value={p.rating ?? ''} onChange={e => up('rating', e.target.value === '' ? '' : +e.target.value)} placeholder="4.7"
-                  className="num w-full rounded-xl border-[1.5px] border-line bg-white px-3 py-2.5 text-sm font-semibold text-ink outline-none" />
+                <NumberSpinner value={p.rating ?? null} onChange={v => up('rating', v ?? undefined)} min={0} max={5} step={0.5} placeholder="评分" />
               </EdField>
               <EdField label="入住"><EdInput value={p.checkIn || ''} onChange={v => up('checkIn', v)} placeholder="15:00" /></EdField>
               <EdField label="退房"><EdInput value={p.checkOut || ''} onChange={v => up('checkOut', v)} placeholder="11:00" /></EdField>

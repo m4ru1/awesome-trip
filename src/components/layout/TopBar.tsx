@@ -36,7 +36,7 @@ export default function TopBar({
         {onGoHome && (
           <button
             onClick={onGoHome}
-            className="btn btn-ghost h-9 w-9 !p-0 text-base"
+            className="btn btn-ghost h-9 w-9 !p-0 text-base flex items-center justify-center"
             title="返回首页"
           >
             {'←'}
@@ -73,7 +73,7 @@ export default function TopBar({
 
         <button
           onClick={onShowHelp}
-          className="btn btn-ghost h-9 w-9 !p-0 text-base"
+          className="btn btn-ghost h-9 w-9 !p-0 text-base flex items-center justify-center"
         >
           ?
         </button>

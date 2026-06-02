@@ -15,7 +15,7 @@ export const SEED_TRIP: Trip = {
   party: '2 人 · 情侣',
   days: [
     {
-      id: 'd1', dateLabel: '11/14', weekday: '周五', weatherHint: '多云 15°C', weatherIcon: '⛅',
+      id: 'd1', dateLabel: '11/14', weekday: '周五', weatherHint: '多云', weatherIcon: '⛅', temperature: 15, subtitle: '稻荷 · 清水寺',
       blocks: [
         {
           id: 'b1-1', type: 'sight', startTime: '09:30', endTime: '11:30', status: 'done',
@@ -122,7 +122,7 @@ export const SEED_TRIP: Trip = {
       ],
     },
     {
-      id: 'd2', dateLabel: '11/15', weekday: '周六', weatherHint: '小雨 12°C', weatherIcon: '🌧️',
+      id: 'd2', dateLabel: '11/15', weekday: '周六', weatherHint: '小雨', weatherIcon: '🌧️', temperature: 12, subtitle: '岚山 · 金阁寺',
       blocks: [
         {
           id: 'b2-1', type: 'sight', startTime: '09:00', endTime: '11:00', status: 'planned',
@@ -236,7 +236,7 @@ export const SEED_TRIP: Trip = {
       ],
     },
     {
-      id: 'd3', dateLabel: '11/16', weekday: '周日', weatherHint: '晴 16°C', weatherIcon: '☀️',
+      id: 'd3', dateLabel: '11/16', weekday: '周日', weatherHint: '晴', weatherIcon: '☀️', temperature: 16, subtitle: '大原 · 哲学之道',
       blocks: [
         {
           id: 'b3-1', type: 'sight', startTime: '09:00', endTime: '11:30', status: 'planned',
@@ -326,7 +326,7 @@ export const SEED_TRIP: Trip = {
       ],
     },
     {
-      id: 'd4', dateLabel: '11/17', weekday: '周一', weatherHint: '晴转阴 14°C', weatherIcon: '🌤️',
+      id: 'd4', dateLabel: '11/17', weekday: '周一', weatherHint: '晴转阴', weatherIcon: '🌤️', temperature: 14, subtitle: '二条 · 宇治',
       blocks: [
         {
           id: 'b4-1', type: 'sight', startTime: '09:30', endTime: '11:00', status: 'planned',
@@ -415,7 +415,7 @@ export const SEED_TRIP: Trip = {
       ],
     },
     {
-      id: 'd5', dateLabel: '11/18', weekday: '周二', weatherHint: '晴 17°C', weatherIcon: '☀️',
+      id: 'd5', dateLabel: '11/18', weekday: '周二', weatherHint: '晴', weatherIcon: '☀️', temperature: 17, subtitle: '告别京都',
       blocks: [
         {
           id: 'b5-1', type: 'rest', startTime: '08:30', endTime: '09:30', status: 'planned',

@@ -229,7 +229,7 @@ export default function App() {
     setTrip(prev => {
       const days = [...prev.days]
       const nd = nextDayMeta(days[days.length - 1])
-      days.push({ id: 'd' + Date.now(), dateLabel: nd.dateLabel, weekday: nd.weekday, weatherHint: '待定', weatherIcon: '🌤️', blocks: [] })
+      days.push({ id: 'd' + Date.now(), dateLabel: nd.dateLabel, weekday: nd.weekday, weatherHint: '待定', weatherIcon: '🌤️', temperature: null, blocks: [] })
       newIdx = days.length - 1
       return { ...prev, days }
     })
@@ -598,6 +598,8 @@ export default function App() {
           isMobile={isMobile}
           onClose={() => setDayPanel(null)}
           onUpdate={patch => updateDay(dayPanel, patch)}
+          onDelete={() => { deleteDay(dayPanel); setDayPanel(null) }}
+          dayCount={trip.days.length}
         />
       )}
 

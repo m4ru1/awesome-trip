@@ -65,6 +65,8 @@ export interface Day {
   weekday: string
   weatherHint: string
   weatherIcon: string
+  temperature?: number | null
+  subtitle?: string
   blocks: Block[]
 }
 

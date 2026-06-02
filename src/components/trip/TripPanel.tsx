@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import type { Trip, Day } from '@/types'
+import { WEATHER_PRESETS } from '@/data/constants'
 import EdInput from '@/components/ui/EdInput'
 import EdField from '@/components/ui/EdField'
+import EmojiPicker from '@/components/ui/EmojiPicker'
+import NumberSpinner from '@/components/ui/NumberSpinner'
+import CompactDatePicker from '@/components/ui/CompactDatePicker'
 
 interface Props {
   trip: Trip
@@ -29,7 +33,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
         <span className="text-2xl">{trip.coverEmoji}</span>
         <span className="title-cn text-xl font-extrabold text-white">行程设置</span>
         <span className="flex-1" />
-        <button onClick={onClose} className="h-8 w-8 cursor-pointer rounded-full border-none bg-white/30 text-white">✕</button>
+        <button onClick={onClose} className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-white/30 text-white">✕</button>
       </div>
 
       <div className="overflow-y-auto px-5 py-4">
@@ -107,10 +111,54 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
               )}
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
-              <EdField label="日期"><EdInput value={day.dateLabel} onChange={v => onUpdateDay(di, { dateLabel: v })} /></EdField>
-              <EdField label="星期"><EdInput value={day.weekday} onChange={v => onUpdateDay(di, { weekday: v })} /></EdField>
-              <EdField label="天气图标"><EdInput value={day.weatherIcon} onChange={v => onUpdateDay(di, { weatherIcon: v })} /></EdField>
-              <EdField label="天气"><EdInput value={day.weatherHint} onChange={v => onUpdateDay(di, { weatherHint: v })} /></EdField>
+              <EdField label="日期">
+                <CompactDatePicker
+                  dateLabel={day.dateLabel}
+                  weekday={day.weekday}
+                  onChange={patch => onUpdateDay(di, patch)}
+                />
+              </EdField>
+              <EdField label="小标题"><EdInput value={day.subtitle ?? ''} onChange={v => onUpdateDay(di, { subtitle: v.trim() || undefined })} placeholder="活动概况" /></EdField>
+            </div>
+            <div className="mt-2">
+              <EdField label="天气">
+                <div className="flex flex-wrap gap-1.5">
+                  {WEATHER_PRESETS.map(wp => {
+                    const active = day.weatherIcon === wp.emoji && day.weatherHint === wp.zh
+                    return (
+                      <button
+                        key={wp.id}
+                        onClick={() => onUpdateDay(di, { weatherIcon: wp.emoji, weatherHint: wp.zh })}
+                        className="cursor-pointer rounded-full px-2.5 py-[4px] text-[11.5px] font-bold transition-all duration-150"
+                        style={{
+                          border: `1.5px solid ${active ? 'var(--color-brand)' : 'var(--color-line)'}`,
+                          background: active ? 'rgba(255,107,92,.12)' : '#fff',
+                          color: active ? 'var(--color-brand)' : 'var(--color-ink2)',
+                        }}
+                      >
+                        {wp.emoji} {wp.zh}
+                      </button>
+                    )
+                  })}
+                </div>
+              </EdField>
+            </div>
+            <div className="mt-2">
+              <EdField label="自定义图标" hint="不选预设时可手动输入">
+                <EmojiPicker value={day.weatherIcon} onChange={v => onUpdateDay(di, { weatherIcon: v })} placeholder="☀️" />
+              </EdField>
+            </div>
+            <div className="mt-2">
+              <EdField label="温度" hint="选填">
+                <NumberSpinner
+                  value={day.temperature ?? null}
+                  onChange={v => onUpdateDay(di, { temperature: v })}
+                  placeholder="不显示"
+                  min={-30}
+                  max={55}
+                  suffix="°C"
+                />
+              </EdField>
             </div>
           </div>
         ))}

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import type { Trip } from '@/types'
 import EdInput from '@/components/ui/EdInput'
 import EdField from '@/components/ui/EdField'
+import EmojiPicker from '@/components/ui/EmojiPicker'
 
 interface Props {
   onConfirm: (trip: Trip) => void
@@ -68,7 +69,10 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
           <EdInput value={title} onChange={setTitle} placeholder="新旅行" />
         </EdField>
         <EdField label="封面 Emoji">
-          <EdInput value={coverEmoji} onChange={setCoverEmoji} placeholder="✈️" />
+          <div className="flex items-center gap-2">
+            <EmojiPicker value={coverEmoji} onChange={setCoverEmoji} placeholder="✈️" />
+            <span className="text-xs text-ink3">{coverEmoji || '✈️'}</span>
+          </div>
         </EdField>
         <EdField label="目的地">
           <EdInput value={destinationCity} onChange={setDestinationCity} placeholder="京都 · Kyoto" />

@@ -69,20 +69,40 @@ export default function DayTabs({
               >
                 DAY {di + 1}
               </div>
-              <div
-                className="num"
-                style={{ fontWeight: 700, fontSize: 13.5 }}
-              >
-                {day.dateLabel}
-              </div>
-              <div
-                style={{
-                  fontSize: 10.5,
-                  opacity: active ? 0.9 : 0.6,
-                }}
-              >
-                {day.weekday} {day.weatherIcon}
-              </div>
+              {day.subtitle ? (
+                <>
+                  <div
+                    className="clamp-1"
+                    title={day.subtitle}
+                    style={{ fontWeight: 700, fontSize: 12, lineHeight: 1.2 }}
+                  >
+                    {day.subtitle}
+                  </div>
+                  <div
+                    className="num"
+                    style={{ fontSize: 10.5, opacity: active ? 0.8 : 0.55 }}
+                  >
+                    {day.dateLabel} {day.weekday}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div
+                    className="num"
+                    style={{ fontWeight: 700, fontSize: 13.5 }}
+                  >
+                    {day.dateLabel}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 10.5,
+                      opacity: active ? 0.9 : 0.6,
+                    }}
+                  >
+                    {day.weekday} {day.weatherIcon}
+                  </div>
+                </>
+              )}
             </button>
             {onDayHeaderClick && (
               <button

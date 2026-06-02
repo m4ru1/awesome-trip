@@ -33,4 +33,31 @@ export const MODES: { id: Mode; zh: string; emoji: string }[] = [
   { id: 'share',   zh: '分享', emoji: '💌' },
 ]
 
+export const WEATHER_PRESETS: { id: string; zh: string; emoji: string }[] = [
+  { id: 'sunny',       zh: '晴',       emoji: '☀️' },
+  { id: 'sunny-cloudy', zh: '晴转多云', emoji: '🌤️' },
+  { id: 'cloudy',      zh: '多云',     emoji: '⛅' },
+  { id: 'overcast',    zh: '阴',       emoji: '☁️' },
+  { id: 'light-rain',  zh: '小雨',     emoji: '🌧️' },
+  { id: 'rain',        zh: '雨',       emoji: '🌧️' },
+  { id: 'heavy-rain',  zh: '大雨',     emoji: '⛈️' },
+  { id: 'thunder',     zh: '雷阵雨',   emoji: '⛈️' },
+  { id: 'snow',        zh: '雪',       emoji: '❄️' },
+  { id: 'wind',        zh: '大风',     emoji: '💨' },
+  { id: 'fog',         zh: '雾',       emoji: '🌫️' },
+]
+
 export const SCALE = 1.32
+
+export interface EmojiCategory { id: string; zh: string; emojis: string[] }
+
+export const EMOJI_CATEGORIES: EmojiCategory[] = [
+  { id: 'weather', zh: '天气', emojis: ['☀️','🌤️','⛅','☁️','🌧️','⛈️','🌦️','❄️','💨','🌫️','🌈','🌙','⭐','🔥','☔'] },
+  { id: 'food', zh: '餐饮', emojis: ['🍜','🍱','🍣','🍲','🍚','🥘','🍡','🍶','☕','🍵','🧋','🍰','🍩','🥐','🍺','🥂','🍳','🥗','🍝','🥩'] },
+  { id: 'transport', zh: '交通', emojis: ['🚶','🚇','🚌','🚕','🚆','✈️','🚲','🚄','🚢','🚗','🛵','🚠','🚁','🚊','🚎','🛴'] },
+  { id: 'sight', zh: '景点', emojis: ['📸','⛩️','🏯','🍁','🏮','🗼','🏛️','🖼️','🎋','🧱','🪙','🎎','🏔️','🌊','🌸','🏘️','🎢','🎡'] },
+  { id: 'hotel', zh: '住宿', emojis: ['🛏️','🏨','🏠','🛖','⛺','🏡','🏰','🛌','🏕️'] },
+  { id: 'activity', zh: '活动', emojis: ['🛍️','🎉','🎭','🎨','🚴','🛶','🎤','🎪','🧘','♨️','⛷️','🎣','🏊','🧗'] },
+  { id: 'faces', zh: '表情', emojis: ['😊','😎','🤩','😴','🥳','😋','🤗','🥰','😌','😅','😤','😢'] },
+  { id: 'other', zh: '其他', emojis: ['✨','❤️','💡','📍','📌','🎁','💎','✅','❌','🔔','📋','🏷️','🧳','🎒','📱','💰','⏰'] },
+]

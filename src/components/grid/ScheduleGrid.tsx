@@ -127,7 +127,7 @@ export default function ScheduleGrid({
             top: 0,
             zIndex: 20,
             background: 'var(--paper)',
-            height: 78,
+            height: 88,
           }}
         />
 
@@ -207,11 +207,20 @@ export default function ScheduleGrid({
                     {day.weekday}
                   </span>
                 </div>
+                {day.subtitle && (
+                  <div
+                    className="clamp-1"
+                    title={day.subtitle}
+                    style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--ink)', fontFamily: 'var(--font-cn-body)', marginTop: 1 }}
+                  >
+                    {day.subtitle}
+                  </div>
+                )}
                 <div
                   style={{ fontSize: 11.5, color: 'var(--ink-2)' }}
                   className="clamp-1"
                 >
-                  {day.weatherIcon} {day.weatherHint}
+                  {day.weatherIcon}{day.weatherHint ? ` ${day.weatherHint}` : ''}{day.temperature != null ? ` ${day.temperature}°C` : ''}
                 </div>
               </div>
             </div>
@@ -411,7 +420,8 @@ export default function ScheduleGrid({
                           border: '1px solid rgba(76,125,255,.2)',
                         }}
                       >
-                        {(TRANSPORT_META[b.transportToNext.primary.mode] ?? { emoji: '' }).emoji}{' '}
+                        {(TRANSPORT_META[b.transportToNext.primary.mode] ?? { emoji: '•', zh: '' }).emoji}{' '}
+                        {(TRANSPORT_META[b.transportToNext.primary.mode] ?? { zh: '' }).zh}{' '}
                         {b.transportToNext.primary.duration}
                       </button>
                     </div>
