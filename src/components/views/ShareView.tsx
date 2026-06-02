@@ -8,26 +8,103 @@ import { parseTransportMin } from '@/utils/time'
 import ImageTile from '@/components/ui/ImageTile'
 import TypeTag from '@/components/ui/TypeTag'
 
-interface Props { trip: Trip }
+interface Props {
+  trip: Trip
+  published: boolean
+  dirty: boolean
+  publishing: boolean
+  version?: number
+  shareCode?: string
+  nickname: string
+  onNicknameChange: (n: string) => void
+  onPublish: () => void
+  onSync: () => void
+  onRestore: () => void
+  onUnpublish: () => void
+}
 
-export default function ShareView({ trip }: Props) {
+export default function ShareView({
+  trip, published, dirty, publishing, version, shareCode, nickname,
+  onNicknameChange, onPublish, onSync, onRestore, onUnpublish,
+}: Props) {
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
   const totals = useMemo(() => tripTotals(trip), [trip])
   const [showAlts, setShowAlts] = useState(false)
-  const [copied, setCopied] = useState(false)
+  const [codeCopied, setCodeCopied] = useState(false)
+
+  const handleCopyCode = () => {
+    if (!shareCode) return
+    navigator.clipboard.writeText(shareCode).catch(() => {})
+    setCodeCopied(true)
+    setTimeout(() => setCodeCopied(false), 1600)
+  }
 
   return (
     <motion.div ref={rubberRef} className="overscroll-none h-full overflow-y-auto bg-paper2" style={{ y: rubberY }}>
       {/* Action bar */}
-      <div className="sticky top-0 z-5 flex flex-wrap justify-center gap-2 bg-[rgba(251,239,226,.86)] p-3" style={{ backdropFilter: 'blur(8px)' }}>
-        <button className="btn btn-primary" onClick={() => { setCopied(true); setTimeout(() => setCopied(false), 1600) }}>
-          🔗 {copied ? '已复制只读链接！' : '复制只读链接'}
-        </button>
-        <button className="btn btn-ghost">📥 导出竖版长图</button>
-        <label className="btn btn-ghost cursor-pointer">
-          <input type="checkbox" checked={showAlts} onChange={e => setShowAlts(e.target.checked)} className="mr-1 accent-brand" />
-          公开备选 Plan B
-        </label>
+      <div className="sticky top-0 z-5 flex flex-col gap-2 bg-[rgba(251,239,226,.86)] p-3" style={{ backdropFilter: 'blur(8px)' }}>
+        {/* Nickname row */}
+        <div className="flex items-center justify-center gap-2">
+          <span className="text-xs font-bold text-ink2">昵称</span>
+          <input
+            type="text"
+            value={nickname}
+            onChange={e => onNicknameChange(e.target.value)}
+            placeholder="momo"
+            maxLength={12}
+            className="rounded-xl border border-line bg-white px-3 py-1.5 text-sm font-bold text-ink outline-none transition-colors focus:border-brand"
+            style={{ width: 120, textAlign: 'center' }}
+          />
+        </div>
+        {/* Buttons row */}
+        <div className="flex flex-wrap justify-center gap-2">
+          {!published && (
+            <button className="btn btn-primary" onClick={onPublish} disabled={publishing}>
+              📤 {publishing ? '发布中...' : '发布到方案市场'}
+            </button>
+          )}
+          {published && dirty && (
+            <>
+              <button className="btn btn-primary" onClick={onSync} disabled={publishing}>
+                🔄 {publishing ? '同步中...' : '同步到市场'}
+              </button>
+              <button className="btn btn-ghost" onClick={onRestore} disabled={publishing}>
+                ↺ 恢复市场版本
+              </button>
+            </>
+          )}
+          {published && !dirty && (
+            <span className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-bold text-green-700">
+              ✓ 已同步 {version != null ? `v${version}` : ''}
+            </span>
+          )}
+          {published && shareCode && (
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-[11px] text-ink3">分享码</span>
+              <button
+                onClick={handleCopyCode}
+                className="flex items-center gap-1.5 rounded-xl border border-line bg-white px-3 py-1.5 text-sm font-bold tracking-[2px] text-brand transition-colors hover:border-brand cursor-pointer"
+              >
+                {shareCode}
+                <span className="text-xs">{codeCopied ? '✓ 已复制' : '📋'}</span>
+              </button>
+            </div>
+          )}
+          {published && shareCode && (
+            <div className="text-center text-[10px] text-ink3">
+              通过分享码把行程分享给朋友
+            </div>
+          )}
+          {published && (
+            <button className="btn btn-ghost" onClick={onUnpublish} disabled={publishing}>
+              📤 {publishing ? '...' : '取消发布'}
+            </button>
+          )}
+          <label className="btn btn-ghost cursor-pointer">
+            <input type="checkbox" checked={showAlts} onChange={e => setShowAlts(e.target.checked)} className="mr-1 accent-brand" />
+            公开备选 Plan B
+          </label>
+        </div>
       </div>
 
       <div className="mx-auto max-w-[460px] px-3.5 pb-12">

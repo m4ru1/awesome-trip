@@ -26,7 +26,9 @@ import HelpOverlay from '@/components/onboarding/HelpOverlay'
 import TripPanel from '@/components/trip/TripPanel'
 import DayPanel from '@/components/trip/DayPanel'
 import HomeView from '@/components/home/HomeView'
+import MarketplaceView from '@/components/home/MarketplaceView'
 import TripCreateDialog from '@/components/home/TripCreateDialog'
+import usePublished from '@/hooks/usePublished'
 
 export default function App() {
   const { trips, activeTripId, setActiveTrip, saveTrip, createTrip, deleteTrip, getTrip } = useTripLibrary()
@@ -65,6 +67,10 @@ export default function App() {
   const [showTrip, setShowTrip] = useState(false)
   const [dayPanel, setDayPanel] = useState<number | null>(null)
   const [showCreateTrip, setShowCreateTrip] = useState(false)
+  const [marketplace, setMarketplace] = useState(false)
+  const [nickname, setNickname] = useState(() => {
+    try { return localStorage.getItem('tt_nickname') || 'momo' } catch { return 'momo' }
+  })
 
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -143,6 +149,82 @@ export default function App() {
     if (toastTimer.current) clearTimeout(toastTimer.current)
     toastTimer.current = setTimeout(() => setToast(null), 1800)
   }, [])
+
+  const {
+    publishing, isPublished, isDirty, myShareIds, updateSnapshot, getInfo,
+    handlePublish: publish, handleSync: sync, handleUnpublish: unpublish,
+  } = usePublished(showToast)
+
+  const published = trip?.id ? isPublished(trip.id) : false
+  const dirty = trip ? isDirty(trip) : false
+
+  const handlePublish = useCallback(async () => {
+    if (!trip?.id) return
+    // Detect remix: check if the trip was forked from a known source
+    // The source info would be stored in localStorage by the copy handler
+    let originalAuthor: string | undefined
+    let originalShareId: string | undefined
+    let originalShareCode: string | undefined
+    try {
+      const remix = JSON.parse(localStorage.getItem(`tt_remix_${trip.id}`) || 'null')
+      if (remix) {
+        originalAuthor = remix.author
+        originalShareId = remix.share_id
+        originalShareCode = remix.share_code
+      }
+    } catch { /* ignore */ }
+    await publish(trip, {
+      publisher_nickname: nickname || 'momo',
+      original_author: originalAuthor,
+      original_share_id: originalShareId,
+      original_share_code: originalShareCode,
+    })
+    // Clear remix info after publishing
+    try { localStorage.removeItem(`tt_remix_${trip.id}`) } catch { /* ignore */ }
+  }, [trip, nickname, publish])
+
+  const handleSync = useCallback(async () => {
+    if (!trip?.id) return
+    await sync(trip, nickname || 'momo')
+  }, [trip, nickname, sync])
+
+  const handleUnpublish = useCallback(async () => {
+    if (!trip?.id) return
+    await unpublish(trip.id)
+  }, [trip, unpublish])
+
+  const handleRestore = useCallback(async () => {
+    if (!trip?.id) return
+    try {
+      const map = JSON.parse(localStorage.getItem('tt_published_v1') || '{}')
+      const pinfo = map[trip.id]
+      if (!pinfo) return
+      const { fetchMarketTrip } = await import('@/api/marketplace')
+      const result = await fetchMarketTrip(pinfo.share_id)
+      const restored = forkTrip(result.trip as unknown as typeof trip)
+      setTrip(cloneTrip(restored))
+      updateSnapshot(trip.id, JSON.stringify(restored))
+      showToast('已恢复市场版本')
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : '恢复失败')
+    }
+  }, [trip, showToast, updateSnapshot])
+
+  const handleCopyFromMarketplace = useCallback((newTrip: typeof trip, remixInfo?: { author: string; share_id: string; share_code: string }) => {
+    const forked = forkTrip(newTrip)
+    createTrip(forked)
+    setTrip(cloneTrip(forked))
+    // Store remix info for attribution when user publishes
+    if (remixInfo) {
+      try {
+        localStorage.setItem(`tt_remix_${forked.id}`, JSON.stringify(remixInfo))
+      } catch { /* ignore */ }
+    }
+    setView('trip')
+    setMarketplace(false)
+    setActiveDay(0)
+    showToast('已复制到我的行程')
+  }, [createTrip, showToast])
 
   const openBlock = open ? trip.days[open.dayIdx]?.blocks[open.blockIdx] : null
 
@@ -593,6 +675,14 @@ export default function App() {
 
       <main className="relative min-h-0 flex-1">
         {view === 'home' ? (
+          marketplace ? (
+            <MarketplaceView
+              onCopyTrip={handleCopyFromMarketplace}
+              onBack={() => setMarketplace(false)}
+              myShareIds={myShareIds}
+              showToast={showToast}
+            />
+          ) : (
           <HomeView
             trips={trips}
             onSelectTrip={handleSelectTrip}
@@ -600,7 +690,9 @@ export default function App() {
             onDeleteTrip={deleteTrip}
             onForkTemplate={handleForkTemplate}
             onDuplicateTrip={handleDuplicateTrip}
+            onOpenMarketplace={() => setMarketplace(true)}
           />
+          )
         ) : (
         <>
         <AnimatePresence mode="wait">
@@ -621,7 +713,20 @@ export default function App() {
             exit={{ opacity: 0, y: -20 }}
             transition={animTr({ duration: 0.2, ease: 'easeOut' })}
           >
-          <ShareView trip={trip} />
+          <ShareView
+            trip={trip}
+            published={published}
+            dirty={dirty}
+            publishing={publishing}
+            version={trip?.id ? (getInfo(trip.id)?.version) : undefined}
+            shareCode={trip?.id ? (getInfo(trip.id)?.share_code) : undefined}
+            nickname={nickname}
+            onNicknameChange={n => { setNickname(n); try { localStorage.setItem('tt_nickname', n) } catch {} }}
+            onPublish={handlePublish}
+            onSync={handleSync}
+            onRestore={handleRestore}
+            onUnpublish={handleUnpublish}
+          />
           </motion.div>
         ) : showGrid ? (
           <motion.div key="grid" className="h-full"
