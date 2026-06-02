@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { flushSync } from 'react-dom'
+import { AnimatePresence, motion } from 'motion/react'
 import type { Mode, Block, Day, BlockType, BlockStatus, SwapReason, TransportMode } from '@/types'
 import { SCENARIO_META, TRANSPORT_META } from '@/data/constants'
 import { cloneTrip, forkTrip } from '@/utils/clone'
@@ -64,10 +66,23 @@ export default function App() {
 
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const handleGoHome = useCallback(() => { setView('home') }, [])
+  const handleGoHome = useCallback(() => {
+    const switchView = () => setView('home')
+    if (document.startViewTransition) {
+      document.startViewTransition(() => { flushSync(switchView) })
+    } else {
+      switchView()
+    }
+  }, [])
   const handleSelectTrip = useCallback((id: string) => {
     const t = getTrip(id)
-    if (t) { setTrip(cloneTrip(t)); setActiveTrip(id); setActiveDay(0); setView('trip') }
+    if (!t) return
+    const switchView = () => { setTrip(cloneTrip(t)); setActiveTrip(id); setActiveDay(0); setView('trip') }
+    if (document.startViewTransition) {
+      document.startViewTransition(() => { flushSync(switchView) })
+    } else {
+      switchView()
+    }
   }, [getTrip, setActiveTrip])
   const handleSwitchTrip = useCallback((id: string) => {
     saveTrip(trip)
@@ -586,18 +601,45 @@ export default function App() {
           />
         ) : (
         <>
+        <AnimatePresence mode="wait">
         {planB ? (
+          <motion.div key="planB" className="h-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
           <PlanBView trip={trip} baselineTrip={baseline} baselineTotals={baselineTotals}
             onApplyScenario={applyScenario} onSetPrimaryAt={setPrimaryAtGlobal} onReset={resetPlan} />
+          </motion.div>
         ) : mode === 'share' ? (
+          <motion.div key="share" className="h-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
           <ShareView trip={trip} />
+          </motion.div>
         ) : showGrid ? (
+          <motion.div key="grid" className="h-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
           <ScheduleGrid trip={trip} mode={mode}
             onOpenBlock={(d, b) => setOpen({ dayIdx: d, blockIdx: b })}
             onMoveBlock={moveBlock} onAddBlock={openCreate} onAddDay={addDay}
             onDayHeaderClick={setDayPanel} nowInfo={nowInfo} />
+          </motion.div>
         ) : (
-          <div className="flex h-full flex-col">
+          <motion.div key="timeline" className="flex h-full flex-col"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
             <DayTabs trip={trip} activeIdx={activeDay} onPick={setActiveDay}
               onAddDay={mode === 'plan' ? addDay : undefined}
               onDayHeaderClick={mode === 'plan' ? setDayPanel : undefined}
@@ -608,12 +650,17 @@ export default function App() {
                 onReorderIds={reorderDayByIds} onAddBlock={openCreate}
                 transportBinder={bindTransport} nowInfo={nowInfo} />
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
 
-        {open && detailProps && (isMobile
-          ? <BlockSheet {...detailProps} />
-          : <BlockDrawer {...detailProps} />
+        {open && detailProps && (
+        <AnimatePresence>
+          {isMobile
+            ? <BlockSheet key="detail-panel" {...detailProps} />
+            : <BlockDrawer key="detail-panel" {...detailProps} />
+          }
+        </AnimatePresence>
         )}
 
         {editing && (

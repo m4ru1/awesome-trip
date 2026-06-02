@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react'
+import { motion } from 'motion/react'
 import type { Trip, Mode, TransportMode } from '@/types'
 import { TYPE_META, TRANSPORT_META } from '@/data/constants'
 import { parseTransportMin } from '@/utils/time'
@@ -263,9 +264,11 @@ export default function DayTimeline({
           }
 
           return (
-            <div
+            <motion.div
               key={b.id}
               ref={el => { rowRefs.current[realIdx] = el }}
+              layout
+              transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 1 }}
               style={{
                 transition: isDragging ? 'none' : 'transform .22s var(--ease-spring)',
                 transform: translateY ? `translateY(${translateY}px)` : undefined,
@@ -361,7 +364,7 @@ export default function DayTimeline({
                   transport={b.transportToNext}
                 />
               )}
-            </div>
+            </motion.div>
           )
         })}
 

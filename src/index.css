@@ -118,11 +118,8 @@ body.tl-dragging { user-select: none; -webkit-user-select: none; cursor: grabbin
 
 /* ─── Animations ─── */
 @keyframes floatIn { from { opacity: 0; transform: translateY(14px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes popCheck { 0% { transform: scale(0); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
 @keyframes pulseRed { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,107,92,0); } 50% { box-shadow: 0 0 0 5px rgba(255,107,92,.18); } }
 @keyframes flipSwap { 0% { transform: rotateY(0) scale(1); } 50% { transform: rotateY(-12deg) scale(.96); opacity:.6; } 100% { transform: rotateY(0) scale(1); opacity:1; } }
-@keyframes drawerIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes sheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rollNum { from { transform: translateY(40%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
@@ -130,6 +127,33 @@ body.tl-dragging { user-select: none; -webkit-user-select: none; cursor: grabbin
 .conflict-pulse { animation: pulseRed 1.6s ease-in-out infinite; }
 .flip-swap   { animation: flipSwap .42s var(--ease-spring); }
 .roll-num    { animation: rollNum .4s var(--ease-spring); display: inline-block; }
+
+/* ─── CSS Fallback Animations (for motion=off) ─── */
+.card-animated {
+  transition: transform .18s var(--ease-spring), box-shadow .2s ease;
+}
+.card-animated:active { transform: scale(.97); }
+.card-animated:hover { transform: translateY(-2px); }
+
+.view-transition-fallback { animation: fadeIn .2s ease-out; }
+.mode-switch-content { animation: fadeIn .15s ease-out; }
+.tab-indicator { transition: left .2s var(--ease-spring); }
+
+/* ─── Layout Optimization (flow-positioned elements only) ─── */
+.timeline-item {
+  contain: layout style;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 72px;
+}
+
+/* ─── Accessibility: reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
 
 /* Drag & Drop */
 .dragging { opacity: .5; }

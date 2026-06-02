@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { motion } from 'motion/react'
+import { useAnimation } from '@/hooks/useAnimation'
 import type { Trip } from '@/types'
 
 interface Props {
@@ -18,6 +20,8 @@ export default function DayTabs({
   onDayHeaderClick,
   editable = false,
 }: Props): ReactNode {
+  const { enabled } = useAnimation()
+
   return (
     <div
       className="no-select"
@@ -50,16 +54,39 @@ export default function DayTabs({
                 borderRadius: 14,
                 padding: '7px 13px',
                 textAlign: 'center',
-                background: active ? 'var(--color-brand)' : '#fff',
+                background: active ? 'transparent' : '#fff',
                 color: active ? '#fff' : 'var(--color-ink)',
-                boxShadow: active
-                  ? '0 6px 14px rgba(255,107,92,.3)'
-                  : 'var(--shadow-soft)',
                 fontFamily: 'var(--font-cn-body)',
                 position: 'relative',
-                transition: 'all .2s var(--ease-spring)',
+                transition: enabled ? 'color .15s ease' : 'all .2s var(--ease-spring)',
+                overflow: 'hidden',
               }}
             >
+              {active && (
+                <motion.div
+                  layoutId={enabled ? 'day-tab-indicator' : undefined}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 1 }}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: 14,
+                    background: 'var(--color-brand)',
+                    boxShadow: '0 6px 14px rgba(255,107,92,.3)',
+                    zIndex: 0,
+                  }}
+                />
+              )}
+              {!active && (
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: 14,
+                  background: '#fff',
+                  boxShadow: 'var(--shadow-soft)',
+                  zIndex: 0,
+                }} />
+              )}
+              <div style={{ position: 'relative', zIndex: 1 }}>
               <div
                 style={{
                   fontSize: 10.5,
@@ -103,6 +130,7 @@ export default function DayTabs({
                   </div>
                 </>
               )}
+              </div>
             </button>
             {onDayHeaderClick && (
               <button

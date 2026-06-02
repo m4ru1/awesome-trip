@@ -1,3 +1,5 @@
+import { motion } from 'motion/react'
+import { useAnimation } from '@/hooks/useAnimation'
 import { MODES } from '@/data/constants'
 import type { Mode } from '@/types'
 
@@ -8,6 +10,8 @@ interface Props {
 }
 
 export default function ModeSwitcher({ mode, onChange, compact }: Props) {
+  const { enabled } = useAnimation()
+
   return (
     <div className="inline-flex gap-0.5 rounded-[14px] bg-paper2 p-1">
       {MODES.map(m => {
@@ -16,16 +20,32 @@ export default function ModeSwitcher({ mode, onChange, compact }: Props) {
           <button
             key={m.id}
             onClick={() => onChange(m.id)}
-            className="cursor-pointer whitespace-nowrap rounded-[11px] border-none px-4 py-2 text-[13.5px] font-bold transition-all duration-200"
+            className="relative cursor-pointer whitespace-nowrap rounded-[11px] border-none text-[13.5px] font-bold"
             style={{
-              background: on ? '#fff' : 'transparent',
+              background: 'transparent',
               color: on ? 'var(--color-ink)' : 'var(--color-ink2)',
-              boxShadow: on ? '0 3px 9px rgba(75,55,40,.14)' : 'none',
               padding: compact ? '7px 10px' : '8px 15px',
               fontFamily: 'var(--font-cn-body)',
+              transition: 'color .2s ease',
             }}
           >
-            {m.emoji}{compact ? '' : ' ' + m.zh}
+            {on && (
+              <motion.div
+                layoutId={enabled ? 'mode-indicator' : undefined}
+                transition={{ type: 'spring', stiffness: 400, damping: 30, mass: 1 }}
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: 11,
+                  background: '#fff',
+                  boxShadow: '0 3px 9px rgba(75,55,40,.14)',
+                  zIndex: 0,
+                }}
+              />
+            )}
+            <span className="relative z-[1]">
+              {m.emoji}{compact ? '' : ' ' + m.zh}
+            </span>
           </button>
         )
       })}

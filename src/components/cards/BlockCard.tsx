@@ -1,4 +1,5 @@
 import type { ReactNode, CSSProperties } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import type { Block, Mode } from '@/types'
 import { TYPE_META } from '@/data/constants'
 import TagRow from '@/components/ui/TagRow'
@@ -214,8 +215,14 @@ export default function BlockCard({
       )}
 
       {/* Done checkmark stamp */}
+      <AnimatePresence>
       {done && (
-        <span
+        <motion.span
+          key="check"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          exit={{ scale: 0 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 25 }}
           style={{
             position: 'absolute',
             top: -8,
@@ -231,12 +238,12 @@ export default function BlockCard({
             fontSize: 14,
             fontWeight: 800,
             boxShadow: '0 3px 8px rgba(21,184,166,.4)',
-            animation: 'popCheck .4s var(--ease-spring)',
           }}
         >
           ✓
-        </span>
+        </motion.span>
       )}
+      </AnimatePresence>
 
       {/* Conflict warning */}
       {conflict && (

@@ -1,4 +1,5 @@
 import { useState, useCallback, type ReactNode } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import type { Trip, Mode } from '@/types'
 import { SCALE, TRANSPORT_META } from '@/data/constants'
 import { toMin } from '@/utils/time'
@@ -344,6 +345,7 @@ export default function ScheduleGrid({
               )}
 
             {/* blocks */}
+            <AnimatePresence initial={false}>
             {day.blocks.map((b, bi) => {
               const sMin = toMin(b.startTime)
               const eMin =
@@ -364,11 +366,12 @@ export default function ScheduleGrid({
                 nowInfo.min < (toMin(b.endTime) ?? sMin + 75)
 
               return (
-                <div
+                <motion.div
                   key={b.id}
-                  draggable={editable}
-                  onDragStart={e => handleDragStart(e, di, bi)}
-                  onDragEnd={handleDragEnd}
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.85 }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
                   style={{
                     position: 'absolute' as const,
                     top,
@@ -377,6 +380,12 @@ export default function ScheduleGrid({
                     height: h,
                   }}
                 >
+                  <div
+                    draggable={editable}
+                    onDragStart={e => handleDragStart(e, di, bi)}
+                    onDragEnd={handleDragEnd}
+                    style={{ height: '100%' }}
+                  >
                   <BlockCard
                     block={b}
                     mode={mode}
@@ -391,6 +400,7 @@ export default function ScheduleGrid({
                     nowState={isNow ? 'current' : null}
                     style={{ height: '100%', overflow: 'hidden' }}
                   />
+                  </div>
 
                   {/* transport chip(s) between blocks */}
                   {b.transportToNext.length > 0 && (() => {
@@ -479,9 +489,10 @@ export default function ScheduleGrid({
                       </div>
                     )
                   })()}
-                </div>
+                </motion.div>
               )
             })}
+            </AnimatePresence>
 
             {/* add-block button (plan mode only) */}
             {editable &&

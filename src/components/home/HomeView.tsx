@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
+import { motion, AnimatePresence } from 'motion/react'
 import type { Trip } from '@/types'
 
 interface Props {
@@ -98,16 +99,24 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
             </button>
           </div>
         ) : (
-        <div
+        <motion.div
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
             gap: 16,
           }}
         >
-          {trips.map(t => (
-            <button
+          <AnimatePresence initial={false}>
+          {trips.map((t, i) => (
+            <motion.div
               key={t.id}
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.06, ease: 'easeOut' }}
+            >
+            <button
               onClick={() => onSelectTrip(t.id)}
               style={{
                 position: 'relative',
@@ -240,7 +249,9 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
                 )}
               </div>
             </button>
+            </motion.div>
           ))}
+          </AnimatePresence>
 
           <button
             onClick={onCreateTrip}
@@ -270,7 +281,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
             <span style={{ fontSize: 32, color: 'var(--color-ink3)' }}>+</span>
             <span className="text-sm font-bold text-ink2">新建旅行</span>
           </button>
-        </div>
+        </motion.div>
         )}
       </div>
     </div>
