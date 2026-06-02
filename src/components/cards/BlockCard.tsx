@@ -12,6 +12,7 @@ interface Props {
   nowState?: 'current' | 'past' | null
   style?: CSSProperties
   className?: string
+  availableHeight?: number
 }
 
 export default function BlockCard({
@@ -23,6 +24,7 @@ export default function BlockCard({
   nowState = null,
   style,
   className = '',
+  availableHeight,
 }: Props): ReactNode {
   const meta = TYPE_META[block.type]
   const p = block.primary
@@ -205,7 +207,7 @@ export default function BlockCard({
       {!compact && p.tags && p.tags.length > 0 && (
         <TagRow tags={p.tags} color={meta.color} />
       )}
-      {compact && p.tags && p.tags.length > 0 && (
+      {compact && p.tags && p.tags.length > 0 && (availableHeight == null || availableHeight >= 80) && (
         <div style={{ marginTop: 2 }}>
           <TagRow tags={p.tags.slice(0, 3)} color={meta.color} />
         </div>

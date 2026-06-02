@@ -381,6 +381,7 @@ export default function ScheduleGrid({
                     block={b}
                     mode={mode}
                     compact
+                    availableHeight={h}
                     onClick={() => onOpenBlock(di, bi)}
                     isDragging={
                       dragSrc != null &&
