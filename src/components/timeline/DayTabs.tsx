@@ -6,6 +6,7 @@ interface Props {
   activeIdx: number
   onPick: (idx: number) => void
   onAddDay?: () => void
+  onDayHeaderClick?: (idx: number) => void
   editable?: boolean
 }
 
@@ -14,6 +15,7 @@ export default function DayTabs({
   activeIdx,
   onPick,
   onAddDay,
+  onDayHeaderClick,
   editable = false,
 }: Props): ReactNode {
   return (
@@ -31,50 +33,80 @@ export default function DayTabs({
       {trip.days.map((day, di) => {
         const active = di === activeIdx
         return (
-          <button
+          <div
             key={day.id}
-            onClick={() => onPick(di)}
             style={{
               flexShrink: 0,
-              border: 'none',
-              cursor: 'pointer',
-              borderRadius: 14,
-              padding: '7px 13px',
-              textAlign: 'center',
-              background: active ? 'var(--color-brand)' : '#fff',
-              color: active ? '#fff' : 'var(--color-ink)',
-              boxShadow: active
-                ? '0 6px 14px rgba(255,107,92,.3)'
-                : 'var(--shadow-soft)',
-              fontFamily: 'var(--font-cn-body)',
-              position: 'relative',
-              transition: 'all .2s var(--ease-spring)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
             }}
           >
-            <div
+            <button
+              onClick={() => onPick(di)}
               style={{
-                fontSize: 10.5,
-                opacity: active ? 0.9 : 0.55,
-                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: 14,
+                padding: '7px 13px',
+                textAlign: 'center',
+                background: active ? 'var(--color-brand)' : '#fff',
+                color: active ? '#fff' : 'var(--color-ink)',
+                boxShadow: active
+                  ? '0 6px 14px rgba(255,107,92,.3)'
+                  : 'var(--shadow-soft)',
+                fontFamily: 'var(--font-cn-body)',
+                position: 'relative',
+                transition: 'all .2s var(--ease-spring)',
               }}
             >
-              DAY {di + 1}
-            </div>
-            <div
-              className="num"
-              style={{ fontWeight: 700, fontSize: 13.5 }}
-            >
-              {day.dateLabel}
-            </div>
-            <div
-              style={{
-                fontSize: 10.5,
-                opacity: active ? 0.9 : 0.6,
-              }}
-            >
-              {day.weekday} {day.weatherIcon}
-            </div>
-          </button>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  opacity: active ? 0.9 : 0.55,
+                  fontWeight: 700,
+                }}
+              >
+                DAY {di + 1}
+              </div>
+              <div
+                className="num"
+                style={{ fontWeight: 700, fontSize: 13.5 }}
+              >
+                {day.dateLabel}
+              </div>
+              <div
+                style={{
+                  fontSize: 10.5,
+                  opacity: active ? 0.9 : 0.6,
+                }}
+              >
+                {day.weekday} {day.weatherIcon}
+              </div>
+            </button>
+            {onDayHeaderClick && (
+              <button
+                onClick={e => { e.stopPropagation(); onDayHeaderClick(di) }}
+                title="编辑天气"
+                style={{
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderRadius: 10,
+                  width: 28,
+                  height: 28,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: active ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.04)',
+                  color: active ? '#fff' : 'var(--color-ink2)',
+                  fontSize: 13,
+                  flexShrink: 0,
+                }}
+              >
+                ✎
+              </button>
+            )}
+          </div>
         )
       })}
 

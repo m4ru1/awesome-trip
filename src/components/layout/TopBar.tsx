@@ -12,6 +12,7 @@ interface Props {
   onTogglePlanB: () => void
   onShowHelp: () => void
   onShowTrip: () => void
+  onGoHome?: () => void
   activeDay: number
   onSetActiveDay: (i: number) => void
   onSetNowMin: (m: number) => void
@@ -19,7 +20,7 @@ interface Props {
 
 export default function TopBar({
   trip, mode, planB, isMobile, nowMin,
-  onSetMode, onTogglePlanB, onShowHelp, onShowTrip,
+  onSetMode, onTogglePlanB, onShowHelp, onShowTrip, onGoHome,
   activeDay, onSetActiveDay, onSetNowMin,
 }: Props) {
   return (
@@ -31,6 +32,17 @@ export default function TopBar({
       }}
     >
       <div className="flex items-center gap-3 px-5 py-3 max-[860px]:px-3.5 max-[860px]:py-2.5">
+        {/* Back to home */}
+        {onGoHome && (
+          <button
+            onClick={onGoHome}
+            className="btn btn-ghost h-9 w-9 !p-0 text-base"
+            title="返回首页"
+          >
+            {'←'}
+          </button>
+        )}
+
         {/* Trip title button */}
         <button
           onClick={onShowTrip}

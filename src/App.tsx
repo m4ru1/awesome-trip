@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import type { Mode, Block, Day, BlockType, BlockStatus, SwapReason, TransportMode } from '@/types'
-import { SEED_TRIP } from '@/data/seed'
 import { SCENARIO_META, TRANSPORT_META } from '@/data/constants'
 import { cloneTrip } from '@/utils/clone'
 import { toMin, parseTransportMin } from '@/utils/time'
 import { flagConflicts, sortByStart, nextStartFor, shiftFrom, recalcDay } from '@/utils/transforms'
 import { tripTotals } from '@/utils/totals'
 import { useIsMobile } from '@/hooks/useIsMobile'
+import useTripLibrary from '@/hooks/useTripLibrary'
 
 import TopBar from '@/components/layout/TopBar'
 import DayTabs from '@/components/timeline/DayTabs'
@@ -20,12 +20,23 @@ import BlockEditor from '@/components/editor/BlockEditor'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import HelpOverlay from '@/components/onboarding/HelpOverlay'
 import TripPanel from '@/components/trip/TripPanel'
+import DayPanel from '@/components/trip/DayPanel'
+import HomeView from '@/components/home/HomeView'
+import TripCreateDialog from '@/components/home/TripCreateDialog'
 
 export default function App() {
-  const baseline = useMemo(() => cloneTrip(SEED_TRIP), [])
+  const { trips, activeTripId, setActiveTrip, saveTrip, createTrip, deleteTrip, getTrip } = useTripLibrary()
+
+  const initialTrip = useMemo(() => getTrip(activeTripId) ?? cloneTrip(trips[0] ?? getTrip('')), [getTrip, activeTripId, trips])
+  const [trip, setTrip] = useState(initialTrip)
+
+  // Sync trip back to library whenever it changes
+  useEffect(() => { if (trip) saveTrip(trip) }, [trip, saveTrip])
+
+  const baseline = useMemo(() => cloneTrip(trip), [trip])
   const baselineTotals = useMemo(() => tripTotals(baseline), [baseline])
 
-  const [trip, setTrip] = useState(() => cloneTrip(SEED_TRIP))
+  const [view, setView] = useState<'home' | 'trip'>(() => trips.length > 0 ? 'trip' : 'home')
   const [mode, setMode] = useState<Mode>('plan')
   const [planB, setPlanB] = useState(false)
   const [activeDay, setActiveDay] = useState(0)
@@ -44,8 +55,28 @@ export default function App() {
   const [confirmDel, setConfirmDel] = useState<{ dayIdx: number; blockIdx: number; name: string } | null>(null)
   const [showHelp, setShowHelp] = useState(false)
   const [showTrip, setShowTrip] = useState(false)
+  const [dayPanel, setDayPanel] = useState<number | null>(null)
+  const [showCreateTrip, setShowCreateTrip] = useState(false)
 
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleGoHome = useCallback(() => { setView('home') }, [])
+  const handleSelectTrip = useCallback((id: string) => {
+    const t = getTrip(id)
+    if (t) { setTrip(cloneTrip(t)); setActiveTrip(id); setActiveDay(0); setView('trip') }
+  }, [getTrip, setActiveTrip])
+  const handleSwitchTrip = useCallback((id: string) => {
+    saveTrip(trip)
+    const t = getTrip(id)
+    if (t) { setTrip(cloneTrip(t)); setActiveTrip(id); setActiveDay(0) }
+  }, [trip, saveTrip, getTrip, setActiveTrip])
+  const handleCreateTrip = useCallback((newTrip: typeof trip) => {
+    createTrip(newTrip)
+    setTrip(cloneTrip(newTrip))
+    setView('trip')
+    setActiveDay(0)
+    setShowCreateTrip(false)
+  }, [createTrip])
 
   useEffect(() => {
     try { if (!localStorage.getItem('tt_seen_help_v4')) setShowHelp(true) } catch { setShowHelp(true) }
@@ -203,6 +234,7 @@ export default function App() {
       return { ...prev, days }
     })
     setActiveDay(newIdx)
+    setDayPanel(newIdx)
     showToast(`已加一天 · Day ${newIdx + 1}`)
   }
 
@@ -428,7 +460,7 @@ export default function App() {
     showToast(`已切到「${SCENARIO_META[reason].zh.replace('备选', '方案')}」`)
   }
   function setPrimaryAtGlobal(dayIdx: number, blockIdx: number, altIdx: number) { setPrimaryAlt(dayIdx, blockIdx, altIdx) }
-  function resetPlan() { setTrip(cloneTrip(SEED_TRIP)); showToast('已全部还原') }
+  function resetPlan() { const original = getTrip(trip.id); if (original) setTrip(cloneTrip(original)); showToast('已全部还原') }
 
   /* ── nowInfo (execute mode) ── */
   const nowInfo = useMemo(() => {
@@ -474,16 +506,28 @@ export default function App() {
 
   return (
     <div className="relative flex h-full flex-col">
-      <TopBar
-        trip={trip} mode={mode} planB={planB} isMobile={isMobile} nowMin={nowMin}
-        onSetMode={m => { setMode(m); setPlanB(false) }}
-        onTogglePlanB={() => setPlanB(p => !p)}
-        onShowHelp={() => setShowHelp(true)}
-        onShowTrip={() => setShowTrip(true)}
-        activeDay={activeDay} onSetActiveDay={setActiveDay} onSetNowMin={setNowMin}
-      />
+      {view === 'trip' && (
+        <TopBar
+          trip={trip} mode={mode} planB={planB} isMobile={isMobile} nowMin={nowMin}
+          onSetMode={m => { setMode(m); setPlanB(false) }}
+          onTogglePlanB={() => setPlanB(p => !p)}
+          onShowHelp={() => setShowHelp(true)}
+          onShowTrip={() => setShowTrip(true)}
+          onGoHome={handleGoHome}
+          activeDay={activeDay} onSetActiveDay={setActiveDay} onSetNowMin={setNowMin}
+        />
+      )}
 
       <main className="relative min-h-0 flex-1">
+        {view === 'home' ? (
+          <HomeView
+            trips={trips}
+            onSelectTrip={handleSelectTrip}
+            onCreateTrip={() => setShowCreateTrip(true)}
+            onDeleteTrip={deleteTrip}
+          />
+        ) : (
+        <>
         {planB ? (
           <PlanBView trip={trip} baselineTrip={baseline} baselineTotals={baselineTotals}
             onApplyScenario={applyScenario} onSetPrimaryAt={setPrimaryAtGlobal} onReset={resetPlan} />
@@ -492,11 +536,14 @@ export default function App() {
         ) : showGrid ? (
           <ScheduleGrid trip={trip} mode={mode}
             onOpenBlock={(d, b) => setOpen({ dayIdx: d, blockIdx: b })}
-            onMoveBlock={moveBlock} onAddBlock={openCreate} onAddDay={addDay} nowInfo={nowInfo} />
+            onMoveBlock={moveBlock} onAddBlock={openCreate} onAddDay={addDay}
+            onDayHeaderClick={setDayPanel} nowInfo={nowInfo} />
         ) : (
           <div className="flex h-full flex-col">
             <DayTabs trip={trip} activeIdx={activeDay} onPick={setActiveDay}
-              onAddDay={mode === 'plan' ? addDay : undefined} editable={mode === 'plan'} />
+              onAddDay={mode === 'plan' ? addDay : undefined}
+              onDayHeaderClick={mode === 'plan' ? setDayPanel : undefined}
+              editable={mode === 'plan'} />
             <div className="min-h-0 flex-1">
               <DayTimeline trip={trip} activeIdx={activeDay} mode={mode}
                 onOpenBlock={(d, b) => setOpen({ dayIdx: d, blockIdx: b })}
@@ -526,6 +573,8 @@ export default function App() {
             onConfirm={() => deleteBlock(confirmDel.dayIdx, confirmDel.blockIdx)}
             onCancel={() => setConfirmDel(null)} />
         )}
+        </>
+        )}
       </main>
 
       {toast && (
@@ -536,11 +585,30 @@ export default function App() {
 
       {showHelp && <HelpOverlay onClose={closeHelp} />}
 
-      {showTrip && <TripPanel trip={trip} isMobile={isMobile} onClose={() => setShowTrip(false)}
+      {view === 'trip' && showTrip && <TripPanel trip={trip} isMobile={isMobile} onClose={() => setShowTrip(false)}
         onUpdateTrip={updateTrip} onUpdateDay={updateDay} onAddDay={addDay} onDeleteDay={deleteDay}
-        onPickDay={i => { setActiveDay(i); setShowTrip(false) }} />}
+        onPickDay={i => { setActiveDay(i); setShowTrip(false) }}
+        allTrips={trips} activeTripId={activeTripId}
+        onSwitchTrip={handleSwitchTrip} onGoHome={handleGoHome} />}
 
-      {mode === 'plan' && !planB && !open && (
+      {view === 'trip' && dayPanel !== null && (
+        <DayPanel
+          dayIdx={dayPanel}
+          day={trip.days[dayPanel]}
+          isMobile={isMobile}
+          onClose={() => setDayPanel(null)}
+          onUpdate={patch => updateDay(dayPanel, patch)}
+        />
+      )}
+
+      {showCreateTrip && (
+        <TripCreateDialog
+          onConfirm={handleCreateTrip}
+          onCancel={() => setShowCreateTrip(false)}
+        />
+      )}
+
+      {view === 'trip' && mode === 'plan' && !planB && !open && (
         <div className="absolute bottom-4 left-4 z-20 rounded-[10px] bg-white/80 px-3 py-1.5 text-xs text-ink3 shadow-soft">
           {isMobile ? '长按拖动卡片可重排顺序' : '拖动卡片到别的天 / 别的时段，时间会自动重算'}
         </div>

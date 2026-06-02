@@ -11,6 +11,7 @@ interface Props {
   onMoveBlock: (src: { dayIdx: number; blockIdx: number }, targetDayIdx: number, dropMin: number) => void
   onAddBlock: (dayIdx: number) => void
   onAddDay: () => void
+  onDayHeaderClick: (dayIdx: number) => void
   nowInfo: { dayIdx: number; min: number; blockIdx: number | null; nextBlockIdx: number | null } | null
 }
 
@@ -42,6 +43,7 @@ export default function ScheduleGrid({
   onMoveBlock,
   onAddBlock,
   onAddDay,
+  onDayHeaderClick,
   nowInfo,
 }: Props): ReactNode {
   const { start: rangeStart, end: rangeEnd } = computeRange(trip)
@@ -103,7 +105,7 @@ export default function ScheduleGrid({
   }, [])
 
   /* grid template columns */
-  const gridCols = `58px repeat(${trip.days.length}, minmax(186px, 1fr))${editable ? ' 66px' : ''}`
+  const gridCols = `58px repeat(${trip.days.length}, minmax(186px, 240px))${editable ? ' 66px' : ''}`
   const gridMinWidth = 58 + trip.days.length * 200 + (editable ? 66 : 0)
 
   return (
@@ -133,11 +135,13 @@ export default function ScheduleGrid({
         {trip.days.map((day, di) => (
           <div
             key={day.id}
+            onClick={() => onDayHeaderClick(di)}
             style={{
               position: 'sticky' as const,
               top: 0,
               zIndex: 20,
               padding: '10px 8px 8px',
+              cursor: 'pointer',
             }}
           >
             <div

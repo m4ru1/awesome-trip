@@ -12,10 +12,15 @@ interface Props {
   onAddDay: () => void
   onDeleteDay: (dayIdx: number) => void
   onPickDay: (idx: number) => void
+  allTrips?: Trip[]
+  activeTripId?: string
+  onSwitchTrip?: (id: string) => void
+  onGoHome?: () => void
 }
 
-export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpdateDay, onAddDay, onDeleteDay, onPickDay }: Props) {
+export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpdateDay, onAddDay, onDeleteDay, onPickDay, allTrips, activeTripId, onSwitchTrip, onGoHome }: Props) {
   const [deleting, setDeleting] = useState<number | null>(null)
+  const [showSwitcher, setShowSwitcher] = useState(false)
 
   const content = (
     <div>
@@ -28,6 +33,48 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
       </div>
 
       <div className="overflow-y-auto px-5 py-4">
+        {/* Trip switcher */}
+        {allTrips && allTrips.length > 1 && (
+          <div className="mb-4">
+            <button
+              onClick={() => setShowSwitcher(s => !s)}
+              className="flex w-full items-center gap-2 rounded-2xl border border-line bg-white px-4 py-2.5 text-sm font-bold text-ink2"
+            >
+              {'切换旅行'}
+              <span style={{ transform: showSwitcher ? 'rotate(180deg)' : '', transition: 'transform .2s' }}>{'▾'}</span>
+            </button>
+            {showSwitcher && (
+              <div className="mt-2 rounded-2xl border border-line bg-white overflow-hidden">
+                {allTrips.map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => { onSwitchTrip?.(t.id); setShowSwitcher(false) }}
+                    className="flex w-full items-center gap-3 border-none bg-transparent px-4 py-3 text-left cursor-pointer"
+                    style={{
+                      background: t.id === activeTripId ? 'var(--color-paper2)' : '#fff',
+                      borderBottom: '1px solid var(--color-line)',
+                    }}
+                  >
+                    <span>{t.coverEmoji}</span>
+                    <span className="text-sm font-bold text-ink">{t.title}</span>
+                    <span className="text-xs text-ink3">{t.days.length}天</span>
+                    {t.id === activeTripId && <span className="ml-auto text-xs text-ink3">(当前)</span>}
+                  </button>
+                ))}
+                {onGoHome && (
+                  <button
+                    onClick={onGoHome}
+                    className="flex w-full items-center gap-2 border-none bg-transparent px-4 py-3 text-left cursor-pointer"
+                    style={{ borderTop: '1px solid var(--color-line)' }}
+                  >
+                    {'← 返回主页'}
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Trip meta */}
         <EdField label="标题"><EdInput value={trip.title} onChange={v => onUpdateTrip({ title: v })} /></EdField>
         <EdField label="副标题"><EdInput value={trip.subtitle} onChange={v => onUpdateTrip({ subtitle: v })} /></EdField>
