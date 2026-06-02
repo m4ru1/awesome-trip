@@ -220,6 +220,33 @@ export default function BlockEditor({ kind, variant, blockType, initial, default
             <textarea value={p.highlight || ''} onChange={e => up('highlight', e.target.value)} placeholder="一句话写下为什么值得来这一站…" rows={2}
               className="w-full resize-y rounded-xl border-[1.5px] border-line bg-white px-3 py-2.5 text-[13.5px] leading-snug text-ink outline-none" style={{ fontFamily: 'var(--font-cn-body)' }} />
           </EdField>
+
+          {/* Tags */}
+          <EdField label="标签" hint="自由添加，按回车确认">
+            <div className="flex flex-wrap gap-2">
+              {(p.tags ?? []).map((t, i) => (
+                <span key={i} className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold"
+                  style={{ background: m.soft, color: m.color, border: `1px solid ${m.color}33` }}>
+                  {t}
+                  <button onClick={() => up('tags', (p.tags ?? []).filter((_, j) => j !== i))}
+                    className="ml-0.5 inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-full border-none text-[10px]"
+                    style={{ background: 'rgba(0,0,0,.08)', color: m.color }}>✕</button>
+                </span>
+              ))}
+              <input
+                placeholder={((p.tags ?? []).length === 0 ? '例如：赏枫名所、世界遗产' : '＋ 添加标签')}
+                className="min-w-[120px] flex-1 rounded-xl border-[1.5px] border-dashed border-line bg-transparent px-3 py-1.5 text-[12.5px] text-ink outline-none"
+                style={{ fontFamily: 'var(--font-cn-body)' }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    const v = (e.target as HTMLInputElement).value.trim()
+                    if (v) { up('tags', [...(p.tags ?? []), v]); (e.target as HTMLInputElement).value = '' }
+                  }
+                }}
+              />
+            </div>
+          </EdField>
         </div>
 
         {/* Footer */}

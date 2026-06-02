@@ -1,6 +1,7 @@
 import type { ReactNode, CSSProperties } from 'react'
 import type { Block, Mode } from '@/types'
 import { TYPE_META } from '@/data/constants'
+import TagRow from '@/components/ui/TagRow'
 
 interface Props {
   block: Block
@@ -197,6 +198,16 @@ export default function BlockCard({
               : p.ticketPrice
                 ? p.ticketPrice
                 : (p.address ?? '')}
+        </div>
+      )}
+
+      {/* Tags */}
+      {!compact && p.tags && p.tags.length > 0 && (
+        <TagRow tags={p.tags} color={meta.color} />
+      )}
+      {compact && p.tags && p.tags.length > 0 && (
+        <div style={{ marginTop: 2 }}>
+          <TagRow tags={p.tags.slice(0, 3)} color={meta.color} />
         </div>
       )}
 

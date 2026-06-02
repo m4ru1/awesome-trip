@@ -3,6 +3,7 @@ import type { Option } from '@/types'
 import DetailRow from '@/components/ui/DetailRow'
 import Stars from '@/components/ui/Stars'
 import MiniChip from '@/components/ui/MiniChip'
+import TagRow from '@/components/ui/TagRow'
 
 interface Props {
   option: Option
@@ -46,6 +47,11 @@ export default function RestDetail({ option: o }: Props): ReactNode {
               </MiniChip>
             ))}
           </div>
+        </div>
+      )}
+      {o.tags && o.tags.length > 0 && (
+        <div style={{ marginTop: 14 }}>
+          <TagRow tags={o.tags} color="var(--color-rest)" />
         </div>
       )}
     </div>
