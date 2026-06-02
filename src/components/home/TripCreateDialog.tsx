@@ -12,6 +12,7 @@ interface Props {
 
 export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactNode {
   const [title, setTitle] = useState('新旅行')
+  const [subtitle, setSubtitle] = useState('')
   const [coverEmoji, setCoverEmoji] = useState('✈️')
   const [destinationCity, setDestinationCity] = useState('')
   const [dateRange, setDateRange] = useState('')
@@ -21,7 +22,7 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
     const trip: Trip = {
       id: 't-' + Date.now(),
       title: title.trim() || '新旅行',
-      subtitle: '',
+      subtitle: subtitle.trim(),
       destinationCity,
       coverEmoji: coverEmoji || '✈️',
       coverColor: '#FF8A4C',
@@ -67,6 +68,9 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
 
         <EdField label="旅行名称">
           <EdInput value={title} onChange={setTitle} placeholder="新旅行" />
+        </EdField>
+        <EdField label="副标题" hint="选填">
+          <EdInput value={subtitle} onChange={setSubtitle} placeholder="追着红叶，慢慢走过古都的秋天" />
         </EdField>
         <EdField label="封面 Emoji">
           <div className="flex items-center gap-2">

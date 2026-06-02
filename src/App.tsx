@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import type { Mode, Block, Day, BlockType, BlockStatus, SwapReason, TransportMode } from '@/types'
 import { SCENARIO_META, TRANSPORT_META } from '@/data/constants'
-import { cloneTrip } from '@/utils/clone'
+import { cloneTrip, forkTrip } from '@/utils/clone'
+import { SEED_TRIP } from '@/data/seed'
 import { toMin, parseTransportMin } from '@/utils/time'
 import { flagConflicts, sortByStart, nextStartFor, shiftFrom, recalcDay } from '@/utils/transforms'
 import { tripTotals } from '@/utils/totals'
@@ -27,7 +28,10 @@ import TripCreateDialog from '@/components/home/TripCreateDialog'
 export default function App() {
   const { trips, activeTripId, setActiveTrip, saveTrip, createTrip, deleteTrip, getTrip } = useTripLibrary()
 
-  const initialTrip = useMemo(() => getTrip(activeTripId) ?? cloneTrip(trips[0] ?? getTrip('')), [getTrip, activeTripId, trips])
+  const initialTrip = useMemo(() => {
+    const found = getTrip(activeTripId) ?? trips[0]
+    return found ? cloneTrip(found) : { id: '', title: '', subtitle: '', destinationCity: '', coverEmoji: '', coverColor: '#FF8A4C', dateRange: '', party: '', days: [] }
+  }, [getTrip, activeTripId, trips])
   const [trip, setTrip] = useState(initialTrip)
 
   // Sync trip back to library whenever it changes
@@ -83,6 +87,7 @@ export default function App() {
             weatherHint: '待定',
             weatherIcon: '🌤️',
             temperature: null,
+            subtitle: undefined,
             blocks: [],
           }],
         }
@@ -93,6 +98,19 @@ export default function App() {
     setActiveDay(0)
     setShowCreateTrip(false)
   }, [createTrip])
+
+  const handleForkTemplate = useCallback(() => {
+    handleCreateTrip(forkTrip(SEED_TRIP))
+  }, [handleCreateTrip])
+
+  const handleDuplicateTrip = useCallback((id: string) => {
+    const source = getTrip(id)
+    if (source) handleCreateTrip(forkTrip(source))
+  }, [getTrip, handleCreateTrip])
+
+  useEffect(() => {
+    if (trips.length === 0) setView('home')
+  }, [trips.length])
 
   useEffect(() => {
     try { if (!localStorage.getItem('tt_seen_help_v4')) setShowHelp(true) } catch { setShowHelp(true) }
@@ -268,7 +286,7 @@ export default function App() {
     setTrip(prev => {
       const days = [...prev.days]
       const nd = nextDayMeta(days[days.length - 1])
-      days.push({ id: 'd' + Date.now(), dateLabel: nd.dateLabel, weekday: nd.weekday, weatherHint: '待定', weatherIcon: '🌤️', temperature: null, blocks: [] })
+      days.push({ id: 'd' + Date.now(), dateLabel: nd.dateLabel, weekday: nd.weekday, weatherHint: '待定', weatherIcon: '🌤️', temperature: null, subtitle: undefined, blocks: [] })
       newIdx = days.length - 1
       return { ...prev, days }
     })
@@ -563,6 +581,8 @@ export default function App() {
             onSelectTrip={handleSelectTrip}
             onCreateTrip={() => setShowCreateTrip(true)}
             onDeleteTrip={deleteTrip}
+            onForkTemplate={handleForkTemplate}
+            onDuplicateTrip={handleDuplicateTrip}
           />
         ) : (
         <>
@@ -627,7 +647,8 @@ export default function App() {
         onUpdateTrip={updateTrip} onUpdateDay={updateDay} onAddDay={addDay} onDeleteDay={deleteDay}
         onPickDay={i => { setActiveDay(i); setShowTrip(false) }}
         allTrips={trips} activeTripId={activeTripId}
-        onSwitchTrip={handleSwitchTrip} onGoHome={handleGoHome} />}
+        onSwitchTrip={handleSwitchTrip} onGoHome={handleGoHome}
+        onDuplicateTrip={() => handleDuplicateTrip(trip.id)} />}
 
       {view === 'trip' && dayPanel !== null && (
         <DayPanel

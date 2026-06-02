@@ -20,9 +20,10 @@ interface Props {
   activeTripId?: string
   onSwitchTrip?: (id: string) => void
   onGoHome?: () => void
+  onDuplicateTrip?: () => void
 }
 
-export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpdateDay, onAddDay, onDeleteDay, onPickDay, allTrips, activeTripId, onSwitchTrip, onGoHome }: Props) {
+export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpdateDay, onAddDay, onDeleteDay, onPickDay, allTrips, activeTripId, onSwitchTrip, onGoHome, onDuplicateTrip }: Props) {
   const [deleting, setDeleting] = useState<number | null>(null)
   const [showSwitcher, setShowSwitcher] = useState(false)
 
@@ -65,17 +66,18 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
                     {t.id === activeTripId && <span className="ml-auto text-xs text-ink3">(当前)</span>}
                   </button>
                 ))}
-                {onGoHome && (
-                  <button
-                    onClick={onGoHome}
-                    className="flex w-full items-center gap-2 border-none bg-transparent px-4 py-3 text-left cursor-pointer"
-                    style={{ borderTop: '1px solid var(--color-line)' }}
-                  >
-                    {'← 返回主页'}
-                  </button>
-                )}
               </div>
             )}
+          </div>
+        )}
+        {onGoHome && (
+          <div className="mb-4">
+            <button
+              onClick={onGoHome}
+              className="flex w-full items-center gap-2 rounded-2xl border border-line bg-white px-4 py-2.5 text-sm font-bold text-ink2 cursor-pointer hover:border-brand hover:text-brand transition-colors duration-150"
+            >
+              {'← 返回主页'}
+            </button>
           </div>
         )}
 
@@ -84,6 +86,18 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
         <EdField label="副标题"><EdInput value={trip.subtitle} onChange={v => onUpdateTrip({ subtitle: v })} /></EdField>
         <EdField label="目的地"><EdInput value={trip.destinationCity} onChange={v => onUpdateTrip({ destinationCity: v })} /></EdField>
         <EdField label="出行人"><EdInput value={trip.party} onChange={v => onUpdateTrip({ party: v })} /></EdField>
+
+        {/* Duplicate */}
+        {onDuplicateTrip && (
+          <div className="mb-4">
+            <button
+              onClick={() => { onDuplicateTrip(); onClose() }}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-line bg-white px-4 py-2.5 text-sm font-bold text-ink2 cursor-pointer hover:border-brand hover:text-brand transition-colors duration-150"
+            >
+              {'⧉ 复制此行程'}
+            </button>
+          </div>
+        )}
 
         {/* Days */}
         <div className="mb-3 mt-5 flex items-center gap-2">

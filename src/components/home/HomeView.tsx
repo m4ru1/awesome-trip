@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Trip } from '@/types'
 
@@ -6,6 +7,8 @@ interface Props {
   onSelectTrip: (id: string) => void
   onCreateTrip: () => void
   onDeleteTrip: (id: string) => void
+  onForkTemplate?: () => void
+  onDuplicateTrip?: (id: string) => void
 }
 
 function tripSummary(t: Trip): string {
@@ -17,7 +20,9 @@ function tripSummary(t: Trip): string {
   return parts.join(' · ')
 }
 
-export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTrip }: Props): ReactNode {
+export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTrip, onForkTemplate, onDuplicateTrip }: Props): ReactNode {
+  const [deleting, setDeleting] = useState<string | null>(null)
+
   return (
     <div className="flex h-full flex-col">
       <div
@@ -36,6 +41,63 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
       </div>
 
       <div className="overflow-y-auto p-5">
+        {trips.length === 0 ? (
+          <div className="flex flex-col items-center py-12">
+            <div className="mb-4 text-6xl">{'🗺️'}</div>
+            <div className="title-cn mb-1 text-2xl font-extrabold text-ink">欢迎使用 Awesome Trip</div>
+            <div className="mb-10 text-sm text-ink3">开始规划你的第一次旅行</div>
+
+            <button
+              onClick={onForkTemplate}
+              className="mb-4 w-full max-w-sm rounded-2xl border border-line bg-white p-5 text-left shadow-soft cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:border-brand hover:shadow-pop"
+              style={{ border: '1.5px solid var(--color-line)' }}
+            >
+              <div className="flex items-center gap-4">
+                <span className="flex h-[52px] w-[52px] items-center justify-center rounded-[14px] text-2xl"
+                  style={{ background: 'linear-gradient(140deg, #FF8A4C, #FF6B5C)' }}>
+                  {'🍁'}
+                </span>
+                <div className="flex-1">
+                  <div className="title-cn text-[17px] font-extrabold text-ink">京都赏枫 5 日</div>
+                  <div className="mt-1 text-xs text-ink2 clamp-1">追着红叶，慢慢走过古都的秋天</div>
+                  <div className="mt-2 text-[11.5px] text-ink3">5天 · 26项 · 11/14 – 11/18</div>
+                </div>
+                <span className="text-sm font-bold text-brand">{'从模板开始 →'}</span>
+              </div>
+            </button>
+
+            <button
+              onClick={onCreateTrip}
+              style={{
+                background: 'rgba(255,255,255,.5)',
+                border: '2px dashed #D8C7B2',
+                borderRadius: 20,
+                padding: '20px 18px',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                minHeight: 140,
+                width: '100%',
+                maxWidth: '24rem',
+                transition: 'all .2s var(--ease-spring)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'var(--color-brand)'
+                e.currentTarget.style.background = 'rgba(255,255,255,.8)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = '#D8C7B2'
+                e.currentTarget.style.background = 'rgba(255,255,255,.5)'
+              }}
+            >
+              <span style={{ fontSize: 32, color: 'var(--color-ink3)' }}>+</span>
+              <span className="text-sm font-bold text-ink2">自己创建一个</span>
+            </button>
+          </div>
+        ) : (
         <div
           style={{
             display: 'grid',
@@ -80,34 +142,103 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
               <div className="mt-2 text-[11.5px] text-ink3">{tripSummary(t)}</div>
               {t.party && <div className="mt-1 text-[11px] text-ink3">{t.party}</div>}
 
-              <button
-                onClick={e => {
-                  e.stopPropagation()
-                  onDeleteTrip(t.id)
-                }}
-                title="删除"
-                style={{
-                  position: 'absolute',
-                  top: 12,
-                  right: 12,
-                  border: 'none',
-                  cursor: 'pointer',
-                  borderRadius: 10,
-                  width: 32,
-                  height: 32,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'transparent',
-                  color: 'var(--color-ink3)',
-                  fontSize: 16,
-                  opacity: 0.5,
-                }}
-                onMouseEnter={e => { e.currentTarget.style.opacity = '1' }}
-                onMouseLeave={e => { e.currentTarget.style.opacity = '0.5' }}
-              >
-                {'⋯'}
-              </button>
+              <div className="absolute top-2 right-2 flex gap-1">
+                {deleting === t.id ? (
+                  <>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        onDeleteTrip(t.id)
+                        setDeleting(null)
+                      }}
+                      style={{
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: 8,
+                        padding: '4px 10px',
+                        background: 'var(--color-brand)',
+                        color: '#fff',
+                        fontSize: 12,
+                        fontWeight: 700,
+                      }}
+                    >
+                      确认删除
+                    </button>
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        setDeleting(null)
+                      }}
+                      style={{
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: 8,
+                        padding: '4px 8px',
+                        background: 'transparent',
+                        color: 'var(--color-ink3)',
+                        fontSize: 12,
+                      }}
+                    >
+                      取消
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {onDuplicateTrip && (
+                      <button
+                        onClick={e => {
+                          e.stopPropagation()
+                          onDuplicateTrip(t.id)
+                        }}
+                        title="复制"
+                        style={{
+                          border: 'none',
+                          cursor: 'pointer',
+                          borderRadius: 10,
+                          width: 32,
+                          height: 32,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'transparent',
+                          color: 'var(--color-ink3)',
+                          fontSize: 15,
+                          opacity: 0.5,
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.opacity = '1' }}
+                        onMouseLeave={e => { e.currentTarget.style.opacity = '0.5' }}
+                      >
+                        {'⧉'}
+                      </button>
+                    )}
+                    <button
+                      onClick={e => {
+                        e.stopPropagation()
+                        setDeleting(t.id)
+                      }}
+                      title="删除"
+                      style={{
+                        border: 'none',
+                        cursor: 'pointer',
+                        borderRadius: 10,
+                        width: 32,
+                        height: 32,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'transparent',
+                        color: 'var(--color-ink3)',
+                        fontSize: 16,
+                        opacity: 0.5,
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.opacity = '1' }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '0.5' }}
+                    >
+                      {'⋯'}
+                    </button>
+                  </>
+                )}
+              </div>
             </button>
           ))}
 
@@ -140,6 +271,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
             <span className="text-sm font-bold text-ink2">新建旅行</span>
           </button>
         </div>
+        )}
       </div>
     </div>
   )

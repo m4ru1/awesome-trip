@@ -1,7 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
 import type { Trip } from '@/types'
-import { SEED_TRIP } from '@/data/seed'
-import { cloneTrip } from '@/utils/clone'
 
 const TRIPS_KEY = 'tt_trips_v1'
 const ACTIVE_KEY = 'tt_active_trip_v1'
@@ -14,7 +12,7 @@ function loadTrips(): Trip[] {
       if (Array.isArray(parsed) && parsed.length > 0) return parsed as Trip[]
     }
   } catch { /* ignore */ }
-  return [cloneTrip(SEED_TRIP)]
+  return []
 }
 
 function saveTrips(trips: Trip[]) {
@@ -55,28 +53,25 @@ export default function useTripLibrary() {
   }, [])
 
   const createTrip = useCallback((trip: Trip) => {
-    setTrips(prev => {
-      const next = [...prev, trip]
-      saveActiveId(trip.id)
-      return next
-    })
+    setTrips(prev => [...prev, trip])
     setActiveTripIdState(trip.id)
+    saveActiveId(trip.id)
     return trip
   }, [])
 
   const deleteTrip = useCallback((id: string) => {
-    setTrips(prev => {
-      const next = prev.filter(t => t.id !== id)
-      if (next.length === 0) {
-        const seed = cloneTrip(SEED_TRIP)
-        next.push(seed)
-      }
-      const newActive = next.some(t => t.id === activeTripId) ? activeTripId : next[0].id
-      setActiveTripIdState(newActive)
-      saveActiveId(newActive)
-      return next
-    })
-  }, [activeTripId])
+    const next = trips.filter(t => t.id !== id)
+    if (next.length === 0) {
+      setTrips([])
+      setActiveTripIdState('')
+      saveActiveId('')
+      return
+    }
+    const newActive = next.some(t => t.id === activeTripId) ? activeTripId : next[0].id
+    setTrips(next)
+    setActiveTripIdState(newActive)
+    saveActiveId(newActive)
+  }, [trips, activeTripId])
 
   const getTrip = useCallback((id: string) => {
     return trips.find(t => t.id === id)
