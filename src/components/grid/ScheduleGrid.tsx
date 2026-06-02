@@ -20,8 +20,10 @@ interface Props {
 function computeRange(trip: Trip) {
   let min = 24 * 60
   let max = 0
+  let hasBlocks = false
   trip.days.forEach(day =>
     day.blocks.forEach(b => {
+      hasBlocks = true
       const s = toMin(b.startTime)
       if (s != null) { min = Math.min(min, s) }
       const e = toMin(b.endTime)
@@ -29,6 +31,7 @@ function computeRange(trip: Trip) {
       else if (b.endTime === '次日' && s != null) { max = Math.max(max, s + 60) }
     }),
   )
+  if (!hasBlocks) return { start: 7 * 60, end: 22 * 60 }
   min = Math.floor(min / 60) * 60 - 30
   max = Math.ceil(max / 60) * 60 + 10
   return { start: Math.max(0, min), end: max }
