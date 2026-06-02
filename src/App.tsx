@@ -71,8 +71,24 @@ export default function App() {
     if (t) { setTrip(cloneTrip(t)); setActiveTrip(id); setActiveDay(0) }
   }, [trip, saveTrip, getTrip, setActiveTrip])
   const handleCreateTrip = useCallback((newTrip: typeof trip) => {
-    createTrip(newTrip)
-    setTrip(cloneTrip(newTrip))
+    const wk = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    const today = new Date()
+    const tripWithDay = newTrip.days.length === 0
+      ? {
+          ...newTrip,
+          days: [{
+            id: 'd' + Date.now(),
+            dateLabel: `${today.getMonth() + 1}/${today.getDate()}`,
+            weekday: wk[today.getDay()],
+            weatherHint: '待定',
+            weatherIcon: '🌤️',
+            temperature: null,
+            blocks: [],
+          }],
+        }
+      : newTrip
+    createTrip(tripWithDay)
+    setTrip(cloneTrip(tripWithDay))
     setView('trip')
     setActiveDay(0)
     setShowCreateTrip(false)
