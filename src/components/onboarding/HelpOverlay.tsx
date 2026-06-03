@@ -127,7 +127,7 @@ export default function HelpOverlay({ onClose }: Props) {
         </div>
 
         {/* Animated page content */}
-        <div className="relative min-h-[220px] overflow-hidden" style={{ minHeight: 240 }}>
+        <div className="relative min-h-[220px] overflow-hidden" style={{ minHeight: 240, maxHeight: '50vh' }}>
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={page}
@@ -136,7 +136,7 @@ export default function HelpOverlay({ onClose }: Props) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: dir * -40 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="absolute inset-0 flex flex-col items-center px-6 py-6"
+              className="absolute inset-0 flex flex-col items-center overflow-y-auto px-6 py-6"
             >
               <span className="text-5xl">{p.icon}</span>
               <h3 className="title-cn mt-3 text-[19px] font-extrabold text-ink">{p.title}</h3>
