@@ -63,6 +63,40 @@ Option { id, name, emoji, tags[], highlight?, address?, openHours?, ticketPrice?
 
 `@/` maps to `src/` (configured in both `vite.config.ts` and `tsconfig.json`).
 
+## Deployment
+
+Deploy scripts live in `deploy/` (gitignored, local-only). They deploy to a Tencent Cloud Ubuntu 22.04 server via SSH + rsync.
+
+**Target server:**
+- User: `ubuntu` (sudo-capable)
+- SSH key: `~/.ssh/ssh_deploy_trip.pem`
+- Server IP: configured in `deploy/envs/{production,staging}.env` (`SSH_HOST`)
+
+**Architecture:** Nginx (SSL termination + static file serve) → Express (API only, port 3001/3002), managed by systemd.
+
+**Deploy flow — always stage first, then production:**
+
+```bash
+# Stage first
+make -f deploy/Makefile deploy-staging
+# Verify at https://staging.trip.mollia.space, then:
+make -f deploy/Makefile deploy-production
+```
+
+**When to offer deployment:** After completing a feature or bugfix that the user asked to ship. Say "Ready to deploy. Stage first?" and let the user decide. Do NOT deploy unprompted.
+
+**If deploy fails:** Check server logs (`sudo journalctl -u awesome-trip -n 50`) and Nginx config (`sudo nginx -t`). The most common failure is `better-sqlite3` native module mismatch — the server-side `npm ci --production` rebuilds it for Linux, so never rsync local `node_modules`.
+
+**Key commands reference:**
+```bash
+make -f deploy/Makefile help                        # List all targets
+make -f deploy/Makefile deploy-staging              # Build + rsync + restart staging
+make -f deploy/Makefile deploy-production           # Build + rsync + restart production
+make -f deploy/Makefile init-server ENV=production  # First-time server setup (once per env)
+make -f deploy/Makefile setup-nginx ENV=production  # Configure nginx + SSL cert (once per env)
+ssh -i ~/.ssh/ssh_deploy_trip.pem ubuntu@<IP>       # SSH into server
+```
+
 ## Design Specs
 
 Feature specs are stored in `docs/superpowers/specs/`. Read the relevant spec before implementing any feature.
