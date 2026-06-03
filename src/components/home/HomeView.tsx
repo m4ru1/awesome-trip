@@ -27,7 +27,7 @@ function tripSummary(t: Trip): string {
 
 export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTrip, onForkTemplate, onDuplicateTrip, onOpenMarketplace }: Props): ReactNode {
   const [deleting, setDeleting] = useState<string | null>(null)
-  const { enabled, toggle } = useAnimation()
+  const { enabled } = useAnimation()
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
 
   return (
@@ -37,16 +37,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
         style={{ borderBottom: '1px solid var(--color-line)' }}
       >
         <span className="title-cn flex-1 text-[22px] font-extrabold text-ink max-[860px]:text-[18px]">旅行课程表</span>
-        <button
-          onClick={toggle}
-          className="btn btn-ghost h-9 max-[860px]:!px-0 max-[860px]:w-9 text-sm flex items-center justify-center gap-1"
-          title={enabled ? '动效已开启，点击关闭' : '动效已关闭，点击开启'}
-        >
-          ✨
-          <span className="max-[860px]:hidden" style={{ fontSize: 11, fontWeight: 700, opacity: enabled ? 1 : 0.4 }}>
-            {enabled ? 'ON' : 'OFF'}
-          </span>
-        </button>
+        <span className="text-2xl">{'✈️'}</span>
         {onOpenMarketplace && (
           <button onClick={onOpenMarketplace} className="btn btn-ghost h-9 !px-3 text-sm font-bold">
             🏪 市场
