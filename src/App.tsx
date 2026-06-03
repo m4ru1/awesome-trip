@@ -59,7 +59,7 @@ export default function App() {
   const { collapsed: scrollCollapsed, onScroll: onTimelineScroll, reset: resetScrollCollapse } = useScrollCollapse()
 
   // Collapse mobile toolbar when scrolling down, unless in a mode that needs it
-  const toolbarCollapsed = isMobile && scrollCollapsed && mode !== 'execute' && mode !== 'share' && !planB
+  const toolbarCollapsed = isMobile && (scrollCollapsed || !!open) && mode !== 'execute' && mode !== 'share' && !planB
   const [nowMin, setNowMin] = useState(14 * 60)
   const [toast, setToast] = useState<string | null>(null)
   const [editing, setEditing] = useState<{
