@@ -32,18 +32,18 @@ export default function DayTabs({
         padding: '10px 14px',
         borderBottom: '1px solid var(--color-line)',
         background: 'var(--color-paper)',
-        position: 'relative',
       }}
     >
       <div style={{
-        position: 'absolute',
+        position: 'sticky',
         right: 0,
-        top: 0,
-        bottom: 0,
+        flexShrink: 0,
+        alignSelf: 'stretch',
         width: 28,
+        marginLeft: -28,
         background: 'linear-gradient(to right, transparent, var(--color-paper))',
         pointerEvents: 'none',
-        zIndex: 1,
+        zIndex: 0,
       }} />
       {trip.days.map((day, di) => {
         const active = di === activeIdx
