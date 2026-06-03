@@ -73,28 +73,49 @@ export default function TopBar({
           <ModeSwitcher mode={mode} onChange={onSetMode} />
         )}
 
-        <button
-          onClick={onShowHelp}
-          className="btn btn-ghost h-9 w-9 !p-0 text-base flex items-center justify-center"
-        >
-          ?
-        </button>
-        <button
-          onClick={onTogglePlanB}
-          className="btn text-[13px]"
-          style={{
-            background: planB ? 'var(--color-brand)' : 'var(--color-paper2)',
-            color: planB ? '#fff' : 'var(--color-ink)',
-          }}
-        >
-          🅱️{!isMobile && ' Plan B'}
-        </button>
+        {!isMobile && (
+          <>
+            <button
+              onClick={onShowHelp}
+              className="btn btn-ghost h-9 w-9 !p-0 text-base flex items-center justify-center"
+            >
+              ?
+            </button>
+            <button
+              onClick={onTogglePlanB}
+              className="btn text-[13px]"
+              style={{
+                background: planB ? 'var(--color-brand)' : 'var(--color-paper2)',
+                color: planB ? '#fff' : 'var(--color-ink)',
+              }}
+            >
+              🅱️ Plan B
+            </button>
+          </>
+        )}
       </div>
 
       {/* Mobile: mode switcher on second row */}
       {isMobile && (
-        <div className="flex items-center justify-center px-3.5 pb-2.5">
+        <div className="flex items-center gap-2 px-3.5 pb-2.5">
           <ModeSwitcher mode={mode} onChange={onSetMode} compact />
+          <span className="flex-1" />
+          <button
+            onClick={onShowHelp}
+            className="btn btn-ghost h-9 w-9 !p-0 text-base flex items-center justify-center"
+          >
+            ?
+          </button>
+          <button
+            onClick={onTogglePlanB}
+            className="btn text-[13px]"
+            style={{
+              background: planB ? 'var(--color-brand)' : 'var(--color-paper2)',
+              color: planB ? '#fff' : 'var(--color-ink)',
+            }}
+          >
+            🅱️
+          </button>
         </div>
       )}
 
