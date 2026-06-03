@@ -87,7 +87,14 @@ function TransportIndicator({
         }}
       >
         <span className="num" style={{ fontWeight: 600 }}>
-          {parts.join(' → ')} · {totalMin}min
+          {segments.length === 1
+            ? (() => {
+                const s = segments[0]
+                const tm = TRANSPORT_META[s.primary.mode as TransportMode] ?? { emoji: '•', zh: '' }
+                return `${tm.emoji} ${tm.zh} ${s.primary.duration}`
+              })()
+            : `${parts.join(' → ')} · ${totalMin}min`
+          }
         </span>
       </div>
     </div>

@@ -48,7 +48,10 @@ export default function App() {
   const baselineTotals = useMemo(() => tripTotals(baseline), [baseline])
 
   const [view, setView] = useState<'home' | 'trip'>(() => trips.length > 0 ? 'trip' : 'home')
-  const [mode, setMode] = useState<Mode>('plan')
+  const [mode, setMode] = useState<Mode>(() => {
+    if (trips.length === 0) return 'plan'
+    return initialTrip.days.some(d => d.blocks.length > 0) ? 'view' : 'plan'
+  })
   const [planB, setPlanB] = useState(false)
   const [activeDay, setActiveDay] = useState(0)
   const [open, setOpen] = useState<{ dayIdx: number; blockIdx: number } | null>(null)
@@ -90,7 +93,14 @@ export default function App() {
   const handleSelectTrip = useCallback((id: string) => {
     const t = getTrip(id)
     if (!t) return
-    const switchView = () => { setTrip(cloneTrip(t)); setActiveTrip(id); setActiveDay(0); setView('trip') }
+    const switchView = () => {
+      const cloned = cloneTrip(t)
+      setTrip(cloned)
+      setActiveTrip(id)
+      setActiveDay(0)
+      setView('trip')
+      setMode(cloned.days.some(d => d.blocks.length > 0) ? 'view' : 'plan')
+    }
     if (document.startViewTransition) {
       document.startViewTransition(() => { flushSync(switchView) })
     } else {
