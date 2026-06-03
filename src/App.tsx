@@ -41,7 +41,7 @@ export default function App() {
   const [trip, setTrip] = useState(initialTrip)
 
   // Sync trip back to library whenever it changes
-  useEffect(() => { if (trip) saveTrip(trip) }, [trip, saveTrip])
+  useEffect(() => { if (trip?.id) saveTrip(trip) }, [trip, saveTrip])
 
   const baseline = useMemo(() => cloneTrip(trip), [trip])
   const baselineTotals = useMemo(() => tripTotals(baseline), [baseline])
