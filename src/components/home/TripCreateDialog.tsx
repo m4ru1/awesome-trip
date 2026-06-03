@@ -58,6 +58,9 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
           padding: '28px 24px 22px',
           maxWidth: 380,
           width: '90%',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
           boxShadow: 'var(--shadow-pop)',
           animation: 'floatIn .32s var(--ease-spring)',
         }}
