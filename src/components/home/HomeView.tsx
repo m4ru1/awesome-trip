@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { useAnimation } from '@/hooks/useAnimation'
 import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
 import type { Trip } from '@/types'
+import CoverIcon from '@/components/covers/CoverIcon'
 
 interface Props {
   trips: Trip[]
@@ -156,12 +157,13 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
                 e.currentTarget.style.boxShadow = 'var(--shadow-soft)'
               }}
             >
-              <span
-                className="mb-3 flex h-[52px] w-[52px] items-center justify-center rounded-[14px] text-2xl"
-                style={{ background: `linear-gradient(140deg, ${t.coverColor || '#FF8A4C'}, #FF6B5C)` }}
-              >
-                {t.coverEmoji || '✈️'}
-              </span>
+              <CoverIcon
+                coverId={t.coverId}
+                coverColor={t.coverColor}
+                coverEmoji={t.coverEmoji}
+                size={52}
+                className="mb-3"
+              />
               <div className="title-cn text-[17px] font-extrabold text-ink">{t.title}</div>
               {t.subtitle && <div className="mt-1 text-xs text-ink2 clamp-1">{t.subtitle}</div>}
               <div className="mt-2 text-[11.5px] text-ink3">{tripSummary(t)}</div>
