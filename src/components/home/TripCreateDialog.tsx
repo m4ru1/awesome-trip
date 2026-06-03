@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 import type { Trip } from '@/types'
 import EdInput from '@/components/ui/EdInput'
 import EdField from '@/components/ui/EdField'
-import EmojiPicker from '@/components/ui/EmojiPicker'
+import CoverPicker from '@/components/covers/CoverPicker'
+import { coverList } from '@/components/covers/registry'
 
 interface Props {
   onConfirm: (trip: Trip) => void
@@ -13,7 +14,8 @@ interface Props {
 export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactNode {
   const [title, setTitle] = useState('新旅行')
   const [subtitle, setSubtitle] = useState('')
-  const [coverEmoji, setCoverEmoji] = useState('✈️')
+  const [coverId, setCoverId] = useState(coverList[0]?.meta.id ?? '')
+  const [coverColor, setCoverColor] = useState(coverList[0]?.meta.defaultColor ?? '#FF8A4C')
   const [destinationCity, setDestinationCity] = useState('')
   const [dateRange, setDateRange] = useState('')
   const [party, setParty] = useState('')
@@ -24,9 +26,9 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
       title: title.trim() || '新旅行',
       subtitle: subtitle.trim(),
       destinationCity,
-      coverEmoji: coverEmoji || '✈️',
-      coverId: '',
-      coverColor: '#FF8A4C',
+      coverEmoji: '',
+      coverId,
+      coverColor,
       dateRange,
       party,
       days: [],
@@ -73,11 +75,17 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
         <EdField label="副标题" hint="选填">
           <EdInput value={subtitle} onChange={setSubtitle} placeholder="追着红叶，慢慢走过古都的秋天" />
         </EdField>
-        <EdField label="封面 Emoji">
-          <div className="flex items-center gap-2">
-            <EmojiPicker value={coverEmoji} onChange={setCoverEmoji} placeholder="✈️" />
-            <span className="text-xs text-ink3">{coverEmoji || '✈️'}</span>
-          </div>
+        <EdField label="选择封面">
+          <CoverPicker
+            selectedId={coverId}
+            selectedColor={coverColor}
+            onSelect={(id) => {
+              setCoverId(id)
+              const mod = coverList.find(c => c.meta.id === id)
+              if (mod) setCoverColor(mod.meta.defaultColor)
+            }}
+            onColorChange={setCoverColor}
+          />
         </EdField>
         <EdField label="目的地">
           <EdInput value={destinationCity} onChange={setDestinationCity} placeholder="京都 · Kyoto" />
