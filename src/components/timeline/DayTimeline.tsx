@@ -30,6 +30,7 @@ interface Props {
     blockIdx: number | null
     nextBlockIdx: number | null
   } | null
+  onScroll?: (scrollTop: number) => void
 }
 
 /** Small transport connector rendered between two adjacent blocks. */
@@ -102,6 +103,7 @@ export default function DayTimeline({
   onReorderIds,
   transportBinder: _transportBinder,
   nowInfo,
+  onScroll,
 }: Props): ReactNode {
   const { enabled } = useAnimation()
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
@@ -228,6 +230,7 @@ export default function DayTimeline({
         position: 'relative',
         y: rubberY,
       }}
+      onScroll={onScroll ? (e) => onScroll(e.currentTarget.scrollTop) : undefined}
     >
       {/* Execute mode: "Now" card at the top */}
       {mode === 'execute' && (

@@ -17,12 +17,14 @@ interface Props {
   activeDay: number
   onSetActiveDay: (i: number) => void
   onSetNowMin: (m: number) => void
+  toolbarCollapsed?: boolean
 }
 
 export default function TopBar({
   trip, mode, planB, isMobile, nowMin,
   onSetMode, onTogglePlanB, onShowHelp, onShowTrip, onGoHome,
   activeDay, onSetActiveDay, onSetNowMin,
+  toolbarCollapsed,
 }: Props) {
   return (
     <header
@@ -95,27 +97,38 @@ export default function TopBar({
         )}
       </div>
 
-      {/* Mobile: mode switcher on second row */}
+      {/* Mobile: mode switcher + actions on second row */}
       {isMobile && (
-        <div className="flex items-center gap-2 px-3.5 pb-2.5">
-          <ModeSwitcher mode={mode} onChange={onSetMode} compact />
-          <span className="flex-1" />
-          <button
-            onClick={onShowHelp}
-            className="btn btn-ghost h-9 w-9 !p-0 text-base flex items-center justify-center"
-          >
-            ?
-          </button>
-          <button
-            onClick={onTogglePlanB}
-            className="btn text-[13px]"
-            style={{
-              background: planB ? 'var(--color-brand)' : 'var(--color-paper2)',
-              color: planB ? '#fff' : 'var(--color-ink)',
-            }}
-          >
-            🅱️
-          </button>
+        <div
+          className="toolbar-collapse overflow-hidden"
+          style={{
+            display: 'grid',
+            gridTemplateRows: toolbarCollapsed ? '0fr' : '1fr',
+            transition: 'grid-template-rows 0.22s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+        >
+          <div className="overflow-hidden">
+            <div className="flex items-center justify-center gap-1.5 px-3.5 pb-2.5">
+              <ModeSwitcher mode={mode} onChange={onSetMode} compact />
+              <div className="mx-0.5 h-5 w-px rounded-full bg-line" />
+              <button
+                onClick={onShowHelp}
+                className="btn btn-ghost h-9 w-9 !p-0 text-base flex items-center justify-center"
+              >
+                ?
+              </button>
+              <button
+                onClick={onTogglePlanB}
+                className="btn text-[13px]"
+                style={{
+                  background: planB ? 'var(--color-brand)' : 'var(--color-paper2)',
+                  color: planB ? '#fff' : 'var(--color-ink)',
+                }}
+              >
+                🅱️
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

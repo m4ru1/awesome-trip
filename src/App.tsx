@@ -10,6 +10,7 @@ import { toMin, parseTransportMin } from '@/utils/time'
 import { flagConflicts, sortByStart, nextStartFor, shiftFrom, recalcDay } from '@/utils/transforms'
 import { tripTotals } from '@/utils/totals'
 import { useIsMobile } from '@/hooks/useIsMobile'
+import { useScrollCollapse } from '@/hooks/useScrollCollapse'
 import useTripLibrary from '@/hooks/useTripLibrary'
 
 import TopBar from '@/components/layout/TopBar'
@@ -52,6 +53,10 @@ export default function App() {
   const [activeDay, setActiveDay] = useState(0)
   const [open, setOpen] = useState<{ dayIdx: number; blockIdx: number } | null>(null)
   const isMobile = useIsMobile(860)
+  const { collapsed: scrollCollapsed, onScroll: onTimelineScroll, reset: resetScrollCollapse } = useScrollCollapse()
+
+  // Collapse mobile toolbar when scrolling down, unless in a mode that needs it
+  const toolbarCollapsed = isMobile && scrollCollapsed && mode !== 'execute' && mode !== 'share' && !planB
   const [nowMin, setNowMin] = useState(14 * 60)
   const [toast, setToast] = useState<string | null>(null)
   const [editing, setEditing] = useState<{
@@ -150,6 +155,9 @@ export default function App() {
   useEffect(() => {
     try { if (!localStorage.getItem('tt_seen_help_v4')) setShowHelp(true) } catch { setShowHelp(true) }
   }, [])
+
+  // Reset toolbar collapse when switching modes, days, or toggling plan B
+  useEffect(() => { resetScrollCollapse() }, [mode, planB, activeDay, resetScrollCollapse])
 
   const closeHelp = useCallback(() => {
     setShowHelp(false)
@@ -682,6 +690,7 @@ export default function App() {
           onShowTrip={() => setShowTrip(true)}
           onGoHome={handleGoHome}
           activeDay={activeDay} onSetActiveDay={setActiveDay} onSetNowMin={setNowMin}
+          toolbarCollapsed={toolbarCollapsed}
         />
       )}
 
@@ -767,7 +776,8 @@ export default function App() {
               <DayTimeline trip={trip} activeIdx={activeDay} mode={mode}
                 onOpenBlock={(d, b) => setOpen({ dayIdx: d, blockIdx: b })}
                 onReorderIds={reorderDayByIds} onAddBlock={openCreate}
-                transportBinder={bindTransport} nowInfo={nowInfo} />
+                transportBinder={bindTransport} nowInfo={nowInfo}
+                onScroll={onTimelineScroll} />
             </div>
           </motion.div>
         )}
