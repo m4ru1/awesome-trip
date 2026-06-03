@@ -9,6 +9,8 @@ export interface MarketplaceItem {
   party: string
   days_count: number
   cover_emoji: string
+  cover_id: string
+  cover_color: string
   published_at: number
   updated_at: number | null
   copy_count: number

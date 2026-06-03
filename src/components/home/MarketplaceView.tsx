@@ -4,6 +4,7 @@ import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
 import { fetchMarketplace, fetchMarketTrip, incrementCopyCount } from '@/api/marketplace'
 import type { MarketplaceItem } from '@/api/marketplace'
 import type { Trip } from '@/types'
+import CoverIcon from '@/components/covers/CoverIcon'
 
 interface Props {
   onCopyTrip: (trip: Trip, remixInfo?: { author: string; share_id: string; share_code: string }) => void
@@ -164,12 +165,13 @@ export default function MarketplaceView({ onCopyTrip, onBack, myShareIds, showTo
                   }}
                 >
                   <div className="flex items-start justify-between">
-                    <span
-                      className="mb-3 flex h-[52px] w-[52px] items-center justify-center rounded-[14px] text-2xl"
-                      style={{ background: 'linear-gradient(140deg, #FF8A4C, #FF6B5C)' }}
-                    >
-                      {item.cover_emoji || '🗺️'}
-                    </span>
+                    <CoverIcon
+                      coverId={item.cover_id}
+                      coverColor={item.cover_color}
+                      coverEmoji={item.cover_emoji}
+                      size={52}
+                      className="mb-3"
+                    />
                     {myShareIds.has(item.share_id) && (
                       <span className="rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand">
                         📌 我的
