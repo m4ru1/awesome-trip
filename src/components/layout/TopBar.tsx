@@ -1,5 +1,6 @@
 import ModeSwitcher from './ModeSwitcher'
 import ExecuteBar from './ExecuteBar'
+import CoverIcon from '@/components/covers/CoverIcon'
 import type { Trip, Mode } from '@/types'
 
 interface Props {
@@ -49,12 +50,12 @@ export default function TopBar({
           onClick={onShowTrip}
           className="flex shrink-0 cursor-pointer items-center gap-3 rounded-xl border-none bg-transparent p-0 transition-transform active:scale-[.97]"
         >
-          <span
-            className="flex h-[42px] w-[42px] items-center justify-center rounded-[13px] text-xl"
-            style={{ background: 'linear-gradient(140deg,#FF8A4C,#FF6B5C)' }}
-          >
-            {trip.coverEmoji}
-          </span>
+          <CoverIcon
+            coverId={trip.coverId}
+            coverColor={trip.coverColor}
+            coverEmoji={trip.coverEmoji}
+            size={42}
+          />
           <span className="text-left">
             <span className="title-cn block text-[19px] leading-tight text-ink max-[860px]:text-base clamp-1">
               {trip.title}
