@@ -9,7 +9,9 @@ function loadTrips(): Trip[] {
     const raw = localStorage.getItem(TRIPS_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed as Trip[]
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map((t: Trip) => ({ ...t, coverId: t.coverId ?? '' }))
+      }
     }
   } catch { /* ignore */ }
   return []
