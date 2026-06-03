@@ -10,7 +10,7 @@ function loadTrips(): Trip[] {
     if (raw) {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((t: Trip) => ({ ...t, coverId: t.coverId ?? '' }))
+        return parsed.map((t: Trip) => ({ ...t, coverId: t.coverId ?? '', coverColor: t.coverColor ?? '#FF8A4C' }))
       }
     }
   } catch { /* ignore */ }

@@ -62,8 +62,8 @@ function CoverIcon({
       }}
       dangerouslySetInnerHTML={{
         __html: svgStr.replace(
-          '<svg ',
-          `<svg width="${size}" height="${size}" `
+          /<svg\b/,
+          `<svg width="${size}" height="${size}"`
         ),
       }}
     />

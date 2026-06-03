@@ -26,7 +26,7 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
       title: title.trim() || '新旅行',
       subtitle: subtitle.trim(),
       destinationCity,
-      coverEmoji: '',
+      coverEmoji: undefined,
       coverId,
       coverColor,
       dateRange,
