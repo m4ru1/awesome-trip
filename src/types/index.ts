@@ -5,6 +5,22 @@ export type SwapReason = 'rain' | 'save' | 'time' | 'closed' | 'like'
 export type Mode = 'plan' | 'view' | 'execute' | 'share'
 export type ConflictKind = 'open' | 'close'
 
+// Cover illustration types
+export type CoverCategory = 'city' | 'nature' | 'culture' | 'food' | 'coastal' | 'seasonal'
+
+export interface CoverMeta {
+  id: string
+  name: string
+  tags: string[]
+  category: CoverCategory
+  defaultColor: string
+}
+
+export interface CoverModule {
+  meta: CoverMeta
+  svg: (accentColor: string) => string
+}
+
 export interface Conflict {
   kind: ConflictKind
   msg: string
@@ -75,7 +91,8 @@ export interface Trip {
   title: string
   subtitle: string
   destinationCity: string
-  coverEmoji: string
+  coverEmoji?: string
+  coverId: string
   coverColor: string
   dateRange: string
   party: string
