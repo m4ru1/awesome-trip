@@ -9,6 +9,9 @@ import EdField from '@/components/ui/EdField'
 import EmojiPicker from '@/components/ui/EmojiPicker'
 import NumberSpinner from '@/components/ui/NumberSpinner'
 import CompactDatePicker from '@/components/ui/CompactDatePicker'
+import CoverIcon from '@/components/covers/CoverIcon'
+import { coverMap } from '@/components/covers/registry'
+import CoverPicker from '@/components/covers/CoverPicker'
 
 interface Props {
   trip: Trip
@@ -29,6 +32,7 @@ interface Props {
 export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpdateDay, onAddDay, onDeleteDay, onPickDay, allTrips, activeTripId, onSwitchTrip, onGoHome, onDuplicateTrip }: Props) {
   const [deleting, setDeleting] = useState<number | null>(null)
   const [showSwitcher, setShowSwitcher] = useState(false)
+  const [showCoverPicker, setShowCoverPicker] = useState(false)
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
   const { enabled: animEnabled, tr: animTr } = useAnimation()
 
@@ -36,8 +40,20 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
     <div>
       {/* Header */}
       <div className="flex items-center gap-3 rounded-t-none px-5 py-4" style={{ background: 'linear-gradient(135deg, #FF8A4C, #FF6B5C)' }}>
-        <span className="text-2xl">{trip.coverEmoji}</span>
+        <CoverIcon
+          coverId={trip.coverId}
+          coverColor={trip.coverColor}
+          coverEmoji={trip.coverEmoji}
+          size={36}
+          style={{ borderRadius: 10, color: 'white' }}
+        />
         <span className="title-cn text-xl font-extrabold text-white">行程设置</span>
+        <button
+          onClick={() => setShowCoverPicker(true)}
+          className="flex h-8 cursor-pointer items-center gap-1 rounded-lg border border-white/30 bg-white/20 px-2.5 text-xs font-bold text-white hover:bg-white/30"
+        >
+          更换封面
+        </button>
         <span className="flex-1" />
         <button onClick={onClose} className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-white/30 text-white">✕</button>
       </div>
@@ -65,7 +81,13 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
                       borderBottom: '1px solid var(--color-line)',
                     }}
                   >
-                    <span>{t.coverEmoji}</span>
+                    <CoverIcon
+                      coverId={t.coverId}
+                      coverColor={t.coverColor}
+                      coverEmoji={t.coverEmoji}
+                      size={28}
+                      style={{ borderRadius: 8 }}
+                    />
                     <span className="text-sm font-bold text-ink">{t.title}</span>
                     <span className="text-xs text-ink3">{t.days.length}天</span>
                     {t.id === activeTripId && <span className="ml-auto text-xs text-ink3">(当前)</span>}
@@ -185,6 +207,60 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
     </div>
   )
 
+  const coverPickerDialog = showCoverPicker && (
+    <div
+      onClick={() => setShowCoverPicker(false)}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 1100,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0,0,0,.35)',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: '#fff',
+          borderRadius: 'var(--radius-card)',
+          padding: '24px 20px 20px',
+          maxWidth: 420,
+          width: '90%',
+          maxHeight: '80vh',
+          overflow: 'auto',
+          boxShadow: 'var(--shadow-pop)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <span className="title-cn text-lg font-extrabold text-ink">更换封面</span>
+          <button
+            onClick={() => setShowCoverPicker(false)}
+            className="btn btn-ghost h-8 w-8 !p-0"
+          >
+            ✕
+          </button>
+        </div>
+        <CoverPicker
+          selectedId={trip.coverId}
+          selectedColor={trip.coverColor}
+          onSelect={(coverId) => {
+            const mod = coverMap.get(coverId)
+            onUpdateTrip({
+              ...trip,
+              coverId,
+              coverColor: mod?.meta.defaultColor ?? trip.coverColor,
+            })
+          }}
+          onColorChange={(color) => {
+            onUpdateTrip({ ...trip, coverColor: color })
+          }}
+        />
+      </div>
+    </div>
+  )
+
   if (isMobile) {
     return (
       <>
@@ -193,6 +269,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
           <div className="flex justify-center pt-2 pb-0"><div className="h-[5px] w-10 rounded-full bg-black/12" /></div>
           {content}
         </div>
+        {coverPickerDialog}
       </>
     )
   }
@@ -217,6 +294,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
       >
         {content}
       </motion.div>
+      {coverPickerDialog}
     </>
   )
 }
