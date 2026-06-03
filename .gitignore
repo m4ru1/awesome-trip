@@ -7,3 +7,4 @@ dist/
 *.tsbuildinfo
 .superpowers/
 data/
+deploy/
