@@ -126,6 +126,18 @@ export default function App() {
     handleCreateTrip(forkTrip(SEED_TRIP))
   }, [handleCreateTrip])
 
+  // Auto-fork seed trip on first-ever visit (empty library, no prior seed)
+  const seededRef = useRef(false)
+  useEffect(() => {
+    if (seededRef.current) return
+    seededRef.current = true
+    const seeded = localStorage.getItem('tt_seeded_v1')
+    if (!seeded && trips.length === 0) {
+      handleCreateTrip(forkTrip(SEED_TRIP))
+    }
+    localStorage.setItem('tt_seeded_v1', '1')
+  }, [trips.length, handleCreateTrip])
+
   const handleDuplicateTrip = useCallback((id: string) => {
     const source = getTrip(id)
     if (source) handleCreateTrip(forkTrip(source))
