@@ -23,7 +23,7 @@ router.get('/', rateLimitGet, (_req, res) => {
   const q = typeof _req.query.q === 'string' ? _req.query.q.trim() : ''
   const sort = _req.query.sort === 'popular' ? 'copy_count DESC' : 'updated_at DESC, published_at DESC'
   const SELECT = `
-    SELECT id, share_id, share_code, title, destination, party, days_count, cover_emoji,
+    SELECT id, share_id, share_code, title, destination, party, days_count, cover_emoji, cover_id, cover_color,
            published_at, updated_at, copy_count, version,
            publisher_nickname, original_author, original_share_id, original_share_code
     FROM marketplace`
@@ -65,10 +65,10 @@ router.post('/', rateLimitPost, validatePublish, (req, res) => {
 
   const stmt = db.prepare(`
     INSERT INTO marketplace (id, share_id, share_code, trip_json, title, destination, party,
-      days_count, cover_emoji, published_at, updated_at, version,
+      days_count, cover_emoji, cover_id, cover_color, published_at, updated_at, version,
       token_hash, token_expires_at, publisher_nickname,
       original_author, original_share_id, original_share_code, copy_count)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, 0)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, 0)
   `)
   stmt.run(
     trip.id,
@@ -80,6 +80,8 @@ router.post('/', rateLimitPost, validatePublish, (req, res) => {
     trip.party || '',
     trip.days?.length || 0,
     trip.coverEmoji || '🗺️',
+    trip.coverId || '',
+    trip.coverColor || '#FF8A4C',
     now,
     now,
     tokenHash,
@@ -109,7 +111,7 @@ router.put('/:shareId', rateLimitPost, requireToken, (req, res) => {
   db.prepare(`
     UPDATE marketplace SET
       trip_json = ?, title = ?, destination = ?, party = ?, days_count = ?,
-      cover_emoji = ?, updated_at = ?, version = ?,
+      cover_emoji = ?, cover_id = ?, cover_color = ?, updated_at = ?, version = ?,
       publisher_nickname = COALESCE(?, publisher_nickname)
     WHERE share_id = ?
   `).run(
@@ -119,6 +121,8 @@ router.put('/:shareId', rateLimitPost, requireToken, (req, res) => {
     trip.party || '',
     trip.days?.length || 0,
     trip.coverEmoji || '🗺️',
+    trip.coverId || '',
+    trip.coverColor || '#FF8A4C',
     now,
     newVersion,
     publisher_nickname || null,

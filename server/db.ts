@@ -20,6 +20,8 @@ db.exec(`
     party             TEXT NOT NULL,
     days_count        INTEGER NOT NULL,
     cover_emoji       TEXT NOT NULL,
+    cover_id          TEXT NOT NULL DEFAULT '',
+    cover_color       TEXT NOT NULL DEFAULT '#FF8A4C',
     published_at      INTEGER NOT NULL,
     copy_count        INTEGER DEFAULT 0,
     share_id          TEXT UNIQUE,
@@ -55,6 +57,8 @@ function migrate() {
   if (!names.has('original_share_id')) additions.push('ADD COLUMN original_share_id TEXT')
   if (!names.has('original_share_code')) additions.push('ADD COLUMN original_share_code TEXT')
   if (!names.has('updated_at')) additions.push('ADD COLUMN updated_at INTEGER')
+  if (!names.has('cover_id')) additions.push("ADD COLUMN cover_id TEXT NOT NULL DEFAULT ''")
+  if (!names.has('cover_color')) additions.push("ADD COLUMN cover_color TEXT NOT NULL DEFAULT '#FF8A4C'")
 
   for (const add of additions) {
     try { db.exec(`ALTER TABLE marketplace ${add}`) } catch { /* column exists due to race */ }

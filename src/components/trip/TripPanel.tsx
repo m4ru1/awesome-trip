@@ -277,7 +277,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
   return (
     <>
       <motion.div
-        className="absolute inset-0 z-40"
+        className="absolute inset-0 z-50"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={animTr({ duration: 0.2 })}
@@ -286,7 +286,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
       />
       <motion.div
         ref={rubberRef}
-        className="absolute inset-y-0 right-0 z-41 w-[440px] max-w-[92vw] overflow-y-auto bg-white"
+        className="absolute inset-y-0 right-0 z-60 w-[440px] max-w-[92vw] overflow-y-auto bg-white"
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         transition={animEnabled ? { type: 'spring', stiffness: 200, damping: 26, mass: 1 } : { duration: 0 }}
