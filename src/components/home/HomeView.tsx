@@ -88,36 +88,6 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
               </div>
             </button>
 
-            <button
-              onClick={onCreateTrip}
-              style={{
-                background: 'rgba(255,255,255,.5)',
-                border: '2px dashed #D8C7B2',
-                borderRadius: 20,
-                padding: '20px 18px',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                minHeight: 140,
-                width: '100%',
-                maxWidth: '24rem',
-                transition: 'all .2s var(--ease-spring)',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.borderColor = 'var(--color-brand)'
-                e.currentTarget.style.background = 'rgba(255,255,255,.8)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.borderColor = '#D8C7B2'
-                e.currentTarget.style.background = 'rgba(255,255,255,.5)'
-              }}
-            >
-              <span style={{ fontSize: 32, color: 'var(--color-ink3)' }}>+</span>
-              <span className="text-sm font-bold text-ink2">自己创建一个</span>
-            </button>
           </div>
         ) : (
         <motion.div
