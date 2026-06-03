@@ -7,6 +7,7 @@ import { tripTotals } from '@/utils/totals'
 import { parseTransportMin } from '@/utils/time'
 import ImageTile from '@/components/ui/ImageTile'
 import TypeTag from '@/components/ui/TypeTag'
+import CoverIcon from '@/components/covers/CoverIcon'
 
 interface Props {
   trip: Trip
@@ -110,7 +111,14 @@ export default function ShareView({
       <div className="mx-auto max-w-[460px] px-3.5 pb-12">
         {/* Postcard cover */}
         <div className="relative overflow-hidden rounded-3xl p-7 pb-6 text-white" style={{ background: 'linear-gradient(150deg, #FF8A4C 0%, #FF6B5C 60%, #F5A300 130%)', boxShadow: '0 14px 36px rgba(255,138,76,.3)' }}>
-          <div className="absolute -top-5 -right-2.5 text-[150px] opacity-[.18]" style={{ transform: 'rotate(12deg)' }}>{trip.coverEmoji}</div>
+          <div className="absolute -top-5 -right-2.5 opacity-[.18]" style={{ transform: 'rotate(12deg)' }}>
+            <CoverIcon
+              coverId={trip.coverId}
+              coverColor={trip.coverColor}
+              coverEmoji={trip.coverEmoji}
+              size={150}
+            />
+          </div>
           <div className="num text-[13px] font-semibold tracking-[3px] opacity-90">TRAVEL TIMETABLE</div>
           <h1 className="title-cn m-0 mt-2 text-[38px] leading-tight">{trip.title}</h1>
           <div className="mt-1.5 text-sm opacity-95">{trip.subtitle}</div>
@@ -184,7 +192,12 @@ export default function ShareView({
 
         {/* Footer */}
         <div className="mt-8 text-center text-ink2">
-          <div className="text-3xl">{trip.coverEmoji}</div>
+          <CoverIcon
+            coverId={trip.coverId}
+            coverColor={trip.coverColor}
+            coverEmoji={trip.coverEmoji}
+            size={48}
+          />
           <div className="title-cn mt-1 text-lg">祝旅途愉快</div>
           <div className="mt-0.5 text-xs">TRAVEL TIMETABLE · 旅行课程表</div>
         </div>
