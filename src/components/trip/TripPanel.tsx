@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { motion } from 'motion/react'
 import type { Trip, Day } from '@/types'
 import { WEATHER_PRESETS } from '@/data/constants'
+import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
+import { useAnimation } from '@/hooks/useAnimation'
 import EdInput from '@/components/ui/EdInput'
 import EdField from '@/components/ui/EdField'
 import EmojiPicker from '@/components/ui/EmojiPicker'
@@ -26,6 +29,8 @@ interface Props {
 export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpdateDay, onAddDay, onDeleteDay, onPickDay, allTrips, activeTripId, onSwitchTrip, onGoHome, onDuplicateTrip }: Props) {
   const [deleting, setDeleting] = useState<number | null>(null)
   const [showSwitcher, setShowSwitcher] = useState(false)
+  const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
+  const { enabled: animEnabled, tr: animTr } = useAnimation()
 
   const content = (
     <div>
@@ -37,7 +42,7 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
         <button onClick={onClose} className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-none bg-white/30 text-white">✕</button>
       </div>
 
-      <div className="overscroll-contain overflow-y-auto px-5 py-4">
+      <div className="px-5 py-4">
         {/* Trip switcher */}
         {allTrips && allTrips.length > 1 && (
           <div className="mb-4">
@@ -194,10 +199,24 @@ export default function TripPanel({ trip, isMobile, onClose, onUpdateTrip, onUpd
 
   return (
     <>
-      <div className="absolute inset-0 z-40" style={{ background: 'rgba(43,45,51,.28)', animation: 'fadeIn .2s ease' }} onClick={onClose} />
-      <div className="overscroll-contain absolute inset-y-0 right-0 z-41 w-[440px] max-w-[92vw] overflow-y-auto bg-white" style={{ boxShadow: '-12px 0 40px rgba(75,55,40,.2)', animation: 'drawerIn .34s var(--ease-spring)' }}>
+      <motion.div
+        className="absolute inset-0 z-40"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={animTr({ duration: 0.2 })}
+        style={{ background: 'rgba(43,45,51,.28)' }}
+        onClick={onClose}
+      />
+      <motion.div
+        ref={rubberRef}
+        className="absolute inset-y-0 right-0 z-41 w-[440px] max-w-[92vw] overflow-y-auto bg-white"
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        transition={animEnabled ? { type: 'spring', stiffness: 200, damping: 26, mass: 1 } : { duration: 0 }}
+        style={{ y: rubberY, boxShadow: '-12px 0 40px rgba(75,55,40,.2)', overscrollBehaviorY: 'none' }}
+      >
         {content}
-      </div>
+      </motion.div>
     </>
   )
 }
