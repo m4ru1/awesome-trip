@@ -33,29 +33,29 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
   return (
     <div className="flex h-full flex-col">
       <div
-        className="flex items-center gap-3 px-5 py-4 max-[860px]:px-3.5 max-[860px]:py-2.5"
+        className="flex items-center gap-3 px-5 py-4 max-[860px]:gap-2 max-[860px]:px-3.5 max-[860px]:py-2.5"
         style={{ borderBottom: '1px solid var(--color-line)' }}
       >
         <span className="text-2xl">{'✈️'}</span>
-        <span className="title-cn flex-1 text-[22px] font-extrabold text-ink">我的旅行</span>
+        <span className="title-cn flex-1 text-[22px] font-extrabold text-ink max-[860px]:text-[18px]">旅行课程表</span>
         <button
           onClick={toggle}
-          className="btn btn-ghost h-9 !px-2.5 text-sm flex items-center justify-center gap-1"
+          className="btn btn-ghost h-9 max-[860px]:!px-0 max-[860px]:w-9 text-sm flex items-center justify-center gap-1"
           title={enabled ? '动效已开启，点击关闭' : '动效已关闭，点击开启'}
         >
           ✨
-          <span style={{ fontSize: 11, fontWeight: 700, opacity: enabled ? 1 : 0.4 }}>
+          <span className="max-[860px]:hidden" style={{ fontSize: 11, fontWeight: 700, opacity: enabled ? 1 : 0.4 }}>
             {enabled ? 'ON' : 'OFF'}
           </span>
         </button>
         {onOpenMarketplace && (
-          <button onClick={onOpenMarketplace} className="btn btn-ghost h-9 !px-3 text-sm font-bold">
-            🏪 市场
+          <button onClick={onOpenMarketplace} className="btn btn-ghost h-9 max-[860px]:!px-0 max-[860px]:w-9 text-sm font-bold" title="方案市场">
+            🏪 <span className="max-[860px]:hidden">市场</span>
           </button>
         )}
         <button
           onClick={onCreateTrip}
-          className="rounded-2xl px-4 py-2 text-sm font-bold text-white"
+          className="rounded-2xl px-4 py-2 max-[860px]:px-3 text-sm font-bold text-white"
           style={{ background: 'linear-gradient(135deg, #FF8A4C, #FF6B5C)', boxShadow: '0 6px 14px rgba(255,107,92,.3)' }}
         >
           + 新建
