@@ -80,6 +80,7 @@ export default function BlockSheet({
             overflowY: 'auto',
             overscrollBehaviorY: 'contain',
             boxShadow: '0 -12px 40px rgba(75,55,40,.22)',
+            paddingBottom: 'var(--safe-bottom)',
           }}
         >
           {/* Grab handle */}

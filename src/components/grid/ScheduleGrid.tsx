@@ -418,7 +418,7 @@ export default function ScheduleGrid({
                     const pillStyle = {
                       background: '#fff',
                       color: 'var(--c-transport)',
-                      fontSize: 10,
+                      fontSize: 11,
                       fontWeight: 700 as const,
                       cursor: 'pointer',
                       padding: '1px 7px',

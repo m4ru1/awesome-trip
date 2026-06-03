@@ -29,6 +29,7 @@ export default function TopBar({
       style={{
         background: 'rgba(255,248,240,.9)',
         backdropFilter: 'blur(8px)',
+        paddingTop: 'var(--safe-top)',
       }}
     >
       <div className="flex items-center gap-3 px-5 py-3 max-[860px]:px-3.5 max-[860px]:py-2.5">
@@ -55,7 +56,7 @@ export default function TopBar({
             {trip.coverEmoji}
           </span>
           <span className="text-left">
-            <span className="title-cn block text-[19px] leading-tight text-ink max-[860px]:text-base">
+            <span className="title-cn block text-[19px] leading-tight text-ink max-[860px]:text-base clamp-1">
               {trip.title}
             </span>
             <span className="block text-xs text-ink2">

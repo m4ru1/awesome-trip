@@ -311,7 +311,7 @@ export default function DayTimeline({
                   <div
                     className="num"
                     style={{
-                      fontSize: 10.5,
+                      fontSize: 11,
                       color: 'var(--color-ink3)',
                     }}
                   >
@@ -336,6 +336,8 @@ export default function DayTimeline({
                         touchAction: 'none',
                         lineHeight: 1,
                         transition: 'color .15s',
+                        padding: 10,
+                        margin: '1px -10px 0 0',
                       }}
                     >
                       ⠿

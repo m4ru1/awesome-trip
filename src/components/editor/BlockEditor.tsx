@@ -81,7 +81,7 @@ export default function BlockEditor({ kind, variant, blockType, initial, default
       onClick={onCancel}
     >
       <div
-        className="float-in flex max-h-[90%] w-full max-w-[460px] flex-col overflow-hidden rounded-[22px] bg-white"
+        className="float-in flex max-h-[80%] max-[860px]:max-h-[70%] w-full max-w-[460px] flex-col overflow-hidden rounded-[22px] bg-white"
         style={{ boxShadow: '0 24px 60px rgba(43,45,51,.34)' }}
         onClick={e => e.stopPropagation()}
       >
@@ -176,14 +176,14 @@ export default function BlockEditor({ kind, variant, blockType, initial, default
 
           {/* Type-specific fields */}
           {showVisit && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 max-[860px]:grid-cols-1 gap-3">
               <EdField label="开放时间" hint="选填"><EdInput value={p.openHours || ''} onChange={v => up('openHours', v)} placeholder="08:30–16:00" /></EdField>
               <EdField label="门票" hint="选填"><EdInput value={p.ticketPrice || ''} onChange={v => up('ticketPrice', v)} placeholder="¥1,000 / 免费" /></EdField>
               <EdField label="建议时长" hint="选填"><EdInput value={p.suggestedDuration || ''} onChange={v => up('suggestedDuration', v)} placeholder="2 小时" /></EdField>
             </div>
           )}
           {showFood && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 max-[860px]:grid-cols-1 gap-3">
               <EdField label="菜系" hint="选填"><EdInput value={p.cuisine || ''} onChange={v => up('cuisine', v)} placeholder="日式鳗鱼" /></EdField>
               <EdField label="人均花费" hint="选填"><EdInput value={p.perPersonCost || ''} onChange={v => up('perPersonCost', v)} placeholder="¥3,200" /></EdField>
               <EdField label="预算等级">
@@ -205,7 +205,7 @@ export default function BlockEditor({ kind, variant, blockType, initial, default
             </div>
           )}
           {showStay && (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 max-[860px]:grid-cols-1 gap-3">
               <EdField label="每晚价" hint="选填"><EdInput value={p.pricePerNight || ''} onChange={v => up('pricePerNight', v)} placeholder="¥2,400" /></EdField>
               <EdField label="评分" hint="选填">
                 <NumberSpinner value={p.rating ?? null} onChange={v => up('rating', v ?? undefined)} min={0} max={5} step={0.5} placeholder="评分" />

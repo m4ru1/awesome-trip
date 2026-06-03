@@ -24,7 +24,7 @@ export default function ModeSwitcher({ mode, onChange, compact }: Props) {
             style={{
               background: 'transparent',
               color: on ? 'var(--color-ink)' : 'var(--color-ink2)',
-              padding: compact ? '7px 10px' : '8px 15px',
+              padding: compact ? '10px 12px' : '8px 15px',
               fontFamily: 'var(--font-cn-body)',
               transition: 'color .2s ease',
             }}

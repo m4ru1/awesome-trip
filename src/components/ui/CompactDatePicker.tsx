@@ -83,7 +83,7 @@ export default function CompactDatePicker({ dateLabel, weekday, onChange }: Prop
                 <button
                   key={month}
                   onClick={() => setSelMonth(month)}
-                  className="cursor-pointer rounded-[10px] py-1.5 text-[13px] font-bold transition-all"
+                  className="cursor-pointer rounded-[10px] py-2 text-[13px] font-bold transition-all"
                   style={{
                     border: `1.5px solid ${month === selMonth ? 'var(--color-brand)' : 'var(--color-line)'}`,
                     background: month === selMonth ? 'rgba(255,107,92,.12)' : '#fff',

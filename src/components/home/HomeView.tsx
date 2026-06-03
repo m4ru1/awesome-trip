@@ -32,7 +32,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
   return (
     <div className="flex h-full flex-col">
       <div
-        className="flex items-center gap-3 px-5 py-4"
+        className="flex items-center gap-3 px-5 py-4 max-[860px]:px-3.5 max-[860px]:py-2.5"
         style={{ borderBottom: '1px solid var(--color-line)' }}
       >
         <span className="text-2xl">{'✈️'}</span>
@@ -43,7 +43,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
           title={enabled ? '动效已开启，点击关闭' : '动效已关闭，点击开启'}
         >
           ✨
-          <span style={{ fontSize: 10, fontWeight: 700, opacity: enabled ? 1 : 0.4 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, opacity: enabled ? 1 : 0.4 }}>
             {enabled ? 'ON' : 'OFF'}
           </span>
         </button>

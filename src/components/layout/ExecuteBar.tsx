@@ -18,7 +18,7 @@ export default function ExecuteBar({ trip, activeDay, nowMin, onSetActiveDay, on
           <button
             key={d.id}
             onClick={() => onSetActiveDay(i)}
-            className="cursor-pointer rounded-full border-none px-3 py-1 text-xs font-bold transition-all duration-200"
+            className="cursor-pointer rounded-full border-none px-3 py-2 text-xs font-bold transition-all duration-200"
             style={{
               background: i === activeDay ? 'var(--color-brand)' : '#fff',
               color: i === activeDay ? '#fff' : 'var(--color-ink)',

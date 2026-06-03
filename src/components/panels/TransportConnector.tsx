@@ -64,14 +64,14 @@ function SegmentDetail({
           marginBottom: 10,
         }}
       >
-        <span style={{ fontSize: 11, color: 'var(--color-ink3)', fontWeight: 600 }}>
+        <span style={{ fontSize: 12, color: 'var(--color-ink3)', fontWeight: 600 }}>
           第 {segIdx + 1}/{total} 段
         </span>
         <button
           onClick={onClose}
           className="chip"
           style={{
-            fontSize: 11,
+            fontSize: 12,
             cursor: 'pointer',
             padding: '3px 8px',
             border: '1px solid var(--color-line)',
@@ -185,7 +185,7 @@ function SegmentDetail({
           </div>
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: 'var(--color-ink3)',
               marginTop: 8,
             }}
@@ -255,7 +255,7 @@ function SegmentDetail({
                     <div
                       className="clamp-1"
                       style={{
-                        fontSize: 11,
+                        fontSize: 12,
                         color: 'var(--color-ink3)',
                         marginTop: 3,
                       }}
@@ -406,8 +406,8 @@ export default function TransportConnector({
                     onClick={() => onReorder(idx, idx - 1)}
                     className="chip"
                     style={{
-                      padding: '3px 6px',
-                      fontSize: 11,
+                      padding: '8px 12px',
+                      fontSize: 12,
                       cursor: isFirst ? 'default' : 'pointer',
                       opacity: isFirst ? 0.3 : 0.7,
                       border: '1px solid var(--color-line)',
@@ -423,8 +423,8 @@ export default function TransportConnector({
                     onClick={() => onReorder(idx, idx + 1)}
                     className="chip"
                     style={{
-                      padding: '3px 6px',
-                      fontSize: 11,
+                      padding: '8px 12px',
+                      fontSize: 12,
                       cursor: isLast ? 'default' : 'pointer',
                       opacity: isLast ? 0.3 : 0.7,
                       border: '1px solid var(--color-line)',

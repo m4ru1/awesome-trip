@@ -110,7 +110,7 @@ export default function DetailContent({
       </div>
 
       {/* Body */}
-      <div style={{ padding: '16px 18px 20px' }}>
+      <div style={{ padding: '16px 16px 20px' }}>
         {/* Time range */}
         <div
           className="num"
@@ -124,8 +124,8 @@ export default function DetailContent({
 
         {/* Title */}
         <h2
-          style={{ margin: '4px 0 6px', fontSize: 23, fontWeight: 800 }}
-          className="title-cn"
+          style={{ margin: '4px 0 6px' }}
+          className="title-cn text-[23px] max-[860px]:text-[19px] font-extrabold"
         >
           {p.emoji} {p.name}
         </h2>

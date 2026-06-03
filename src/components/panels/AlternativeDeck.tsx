@@ -126,7 +126,7 @@ export default function AlternativeDeck({
               </div>
               <div
                 style={{
-                  fontSize: 11.5,
+                  fontSize: 12,
                   color: 'var(--color-ink2)',
                   marginTop: 2,
                 }}
@@ -137,7 +137,7 @@ export default function AlternativeDeck({
               <div
                 className="num"
                 style={{
-                  fontSize: 11.5,
+                  fontSize: 12,
                   color: m.color,
                   marginTop: 4,
                   fontWeight: 600,

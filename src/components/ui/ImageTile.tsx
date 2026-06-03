@@ -49,7 +49,7 @@ export default function ImageTile({ type, emoji, height = 96, radius = 14 }: Ima
           position: 'absolute',
           bottom: 6,
           right: 8,
-          fontSize: 10,
+          fontSize: 11,
           fontFamily: 'var(--font-num)',
           color: m.color,
           opacity: 0.7,

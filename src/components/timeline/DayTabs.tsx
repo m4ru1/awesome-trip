@@ -32,8 +32,19 @@ export default function DayTabs({
         padding: '10px 14px',
         borderBottom: '1px solid var(--color-line)',
         background: 'var(--color-paper)',
+        position: 'relative',
       }}
     >
+      <div style={{
+        position: 'absolute',
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: 28,
+        background: 'linear-gradient(to right, transparent, var(--color-paper))',
+        pointerEvents: 'none',
+        zIndex: 1,
+      }} />
       {trip.days.map((day, di) => {
         const active = di === activeIdx
         return (
@@ -89,9 +100,7 @@ export default function DayTabs({
               <div style={{ position: 'relative', zIndex: 1 }}>
               <div
                 style={{
-                  fontSize: 10.5,
-                  opacity: active ? 0.9 : 0.55,
-                  fontWeight: 700,
+                  fontSize: 11,
                 }}
               >
                 DAY {di + 1}
@@ -107,7 +116,7 @@ export default function DayTabs({
                   </div>
                   <div
                     className="num"
-                    style={{ fontSize: 10.5, opacity: active ? 0.8 : 0.55 }}
+                    style={{ fontSize: 11, opacity: active ? 0.8 : 0.55 }}
                   >
                     {day.dateLabel} {day.weekday}
                   </div>
@@ -122,7 +131,7 @@ export default function DayTabs({
                   </div>
                   <div
                     style={{
-                      fontSize: 10.5,
+                      fontSize: 11,
                       opacity: active ? 0.9 : 0.6,
                     }}
                   >
@@ -140,8 +149,8 @@ export default function DayTabs({
                   border: 'none',
                   cursor: 'pointer',
                   borderRadius: 10,
-                  width: 28,
-                  height: 28,
+                  width: 36,
+                  height: 36,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -176,7 +185,7 @@ export default function DayTabs({
           }}
         >
           <div style={{ fontSize: 18 }}>＋</div>
-          <div style={{ fontSize: 9.5, marginTop: 2 }}>加一天</div>
+          <div style={{ fontSize: 11, marginTop: 2 }}>加一天</div>
         </button>
       )}
     </div>

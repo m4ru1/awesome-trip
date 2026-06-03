@@ -18,7 +18,7 @@ export default function ExecuteNowCard({
     <div
       className="float-in"
       style={{
-        margin: '12px 14px',
+        margin: '10px 14px 0',
         borderRadius: 18,
         padding: 14,
         color: '#fff',

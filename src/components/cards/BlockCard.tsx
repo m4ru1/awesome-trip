@@ -41,6 +41,7 @@ export default function BlockCard({
 
   const classes = [
     'block-card',
+    'card-animated',
     `t-${block.type}`,
     isDragging ? 'dragging' : '',
     conflict ? 'conflict-pulse' : '',
@@ -97,7 +98,7 @@ export default function BlockCard({
               style={{
                 background: meta.color,
                 color: '#fff',
-                fontSize: 10.5,
+                fontSize: 12,
                 padding: '2px 8px',
               }}
             >
@@ -112,7 +113,7 @@ export default function BlockCard({
                 background: meta.soft,
                 color: meta.color,
                 fontWeight: 700,
-                fontSize: 11.5,
+                fontSize: 12,
                 borderRadius: 99,
                 padding: '1px 7px',
                 border: `1.5px dashed ${meta.color}`,
@@ -151,7 +152,7 @@ export default function BlockCard({
                 background: meta.soft,
                 color: meta.color,
                 fontWeight: 700,
-                fontSize: 11,
+                fontSize: 12,
                 borderRadius: 99,
                 padding: '1px 6px',
                 border: `1.5px dashed ${meta.color}`,
@@ -252,7 +253,7 @@ export default function BlockCard({
         <div
           style={{
             marginTop: 6,
-            fontSize: 11,
+            fontSize: 12,
             color: 'var(--color-brand)',
             fontWeight: 700,
             display: 'flex',
