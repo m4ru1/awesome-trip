@@ -25,6 +25,7 @@ export default function TripCreateDialog({ onConfirm, onCancel }: Props): ReactN
       subtitle: subtitle.trim(),
       destinationCity,
       coverEmoji: coverEmoji || '✈️',
+      coverId: '',
       coverColor: '#FF8A4C',
       dateRange,
       party,

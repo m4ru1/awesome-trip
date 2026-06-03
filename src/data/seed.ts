@@ -10,7 +10,8 @@ export const SEED_TRIP: Trip = {
   subtitle: '追着红叶，慢慢走过古都的秋天',
   destinationCity: '京都 · Kyoto',
   coverEmoji: '🍁',
-  coverColor: '#FF8A4C',
+  coverId: 'autumn-temple',
+  coverColor: '#D4753B',
   dateRange: '11/14 – 11/18',
   party: '2 人 · 情侣',
   days: [

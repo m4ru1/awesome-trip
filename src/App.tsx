@@ -36,7 +36,7 @@ export default function App() {
 
   const initialTrip = useMemo(() => {
     const found = getTrip(activeTripId) ?? trips[0]
-    return found ? cloneTrip(found) : { id: '', title: '', subtitle: '', destinationCity: '', coverEmoji: '', coverColor: '#FF8A4C', dateRange: '', party: '', days: [] }
+    return found ? cloneTrip(found) : { id: '', title: '', subtitle: '', destinationCity: '', coverEmoji: '', coverId: '', coverColor: '#FF8A4C', dateRange: '', party: '', days: [] }
   }, [getTrip, activeTripId, trips])
   const [trip, setTrip] = useState(initialTrip)
 
