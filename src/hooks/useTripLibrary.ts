@@ -16,15 +16,15 @@ const LEGACY_ACTIVE_KEY = 'tt_active_trip_v1'
 // ── helpers ──
 
 function loadTrips(): Trip[] {
-  // 1. Try v2 primary key
-  let envelope = readEnvelope(TRIPS_KEY)
-  if (envelope && verifyEnvelope(envelope).ok) return envelope.trips
+  // 1. Try v2 primary key (readEnvelope already verifies internally)
+  const envelope = readEnvelope(TRIPS_KEY)
+  if (envelope) return envelope.trips
 
   // 2. Try v2 backup key, restore primary if valid
-  envelope = readEnvelope(TRIPS_BACKUP_KEY)
-  if (envelope && verifyEnvelope(envelope).ok) {
-    writeEnvelope(TRIPS_KEY, envelope.trips)
-    return envelope.trips
+  const backup = readEnvelope(TRIPS_BACKUP_KEY)
+  if (backup) {
+    writeEnvelope(TRIPS_KEY, backup.trips)
+    return backup.trips
   }
 
   // 3. Try v1 legacy key, migrate to v2
@@ -33,9 +33,14 @@ function loadTrips(): Trip[] {
     if (raw) {
       const trips = JSON.parse(raw)
       if (Array.isArray(trips) && trips.length > 0) {
-        writeEnvelope(TRIPS_KEY, trips)
-        writeEnvelope(TRIPS_BACKUP_KEY, trips)
-        return trips
+        const migrated = trips.map((t: Trip) => ({
+          ...t,
+          coverId: t.coverId ?? '',
+          coverColor: t.coverColor ?? '#FF8A4C',
+        }))
+        writeEnvelope(TRIPS_KEY, migrated)
+        writeEnvelope(TRIPS_BACKUP_KEY, migrated)
+        return migrated
       }
     }
   } catch { /* v1 data corrupt */ }
