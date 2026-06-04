@@ -78,10 +78,14 @@ Deploy scripts live in `deploy/` (gitignored, local-only). They deploy to a Tenc
 
 ```bash
 # Stage first
-make -f deploy/Makefile deploy-staging
+make -C deploy deploy-staging
 # Verify at https://staging.trip.mollia.space, then:
-make -f deploy/Makefile deploy-production
+make -C deploy deploy-production
 ```
+
+**Rule: always deploy to staging first.** After any feature or bugfix is merged to main, deploy to staging and verify before touching production. Never skip staging. Only deploy to production after the user confirms staging looks good.
+
+**Deploy before commit.** 部署 staging 先于 git commit。先部署 staging 验证效果，确认无误后再提交代码，避免将有问题的改动提交到 git 历史。流程：开发完成 → 部署 staging → 验证 → 确认后 commit → 再部署 production。
 
 **When to offer deployment:** After completing a feature or bugfix that the user asked to ship. Say "Ready to deploy. Stage first?" and let the user decide. Do NOT deploy unprompted.
 
