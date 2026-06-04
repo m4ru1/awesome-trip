@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { Trip, ExportEnvelope, ImportPreview, ConflictDecision } from '@/types'
 import { validateEnvelope, detectConflicts, applyImport } from '@/services/import'
-import { forkTrip } from '@/utils/clone'
 
 function makeTrip(overrides?: Partial<Trip>): Trip {
   return {

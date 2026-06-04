@@ -9,7 +9,6 @@ import {
 import type { Trip, StorageEnvelope } from '@/types'
 
 const TRIPS_KEY = 'tt_trips_v2'
-const BACKUP_KEY = 'tt_trips_backup_v2'
 
 function makeTrip(overrides?: Partial<Trip>): Trip {
   return {
