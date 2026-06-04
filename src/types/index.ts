@@ -98,3 +98,52 @@ export interface Trip {
   party: string
   days: Day[]
 }
+
+// ─── Storage v2 ───
+export interface StorageEnvelope {
+  version: number
+  savedAt: number
+  tripCount: number
+  trips: Trip[]
+}
+
+// ─── Export ───
+export interface ExportEnvelope {
+  schemaVersion: number         // current = 1
+  appVersion: string
+  exportedAt: number
+  trips: Trip[]
+  tripCount: number
+}
+
+// ─── Storage stats ───
+export interface StorageStats {
+  usedBytes: number
+  tripCount: number
+  tripSizes: { id: string; title: string; bytes: number }[]
+}
+
+export interface IntegrityResult {
+  ok: boolean
+  error?: string
+}
+
+// ─── Import ───
+export type ImportStatus = 'new' | 'conflict'
+
+export interface ImportPreviewItem {
+  importTrip: Trip
+  status: ImportStatus
+  existingTrip?: Trip
+}
+
+export interface ImportPreview {
+  items: ImportPreviewItem[]
+  newCount: number
+  conflictCount: number
+}
+
+export interface ConflictDecision {
+  tripId: string
+  action: 'keep-both' | 'overwrite'
+}
