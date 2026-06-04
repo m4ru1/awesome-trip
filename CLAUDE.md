@@ -19,10 +19,12 @@ Commits follow conventional commit style: `feat:`, `fix:`, `docs:` prefixes with
 ```bash
 npm run dev        # Start dev server (Vite HMR)
 npm run build      # Type-check + production build
+npm run test       # Run 90 tests (vitest + jsdom)
+npx vitest run     # Same as above, direct vitest
 npx tsc --noEmit   # Type-check only (no emit)
 ```
 
-No test suite is configured. The build (`tsc -b && vite build`) is the primary verification step.
+**Test suite:** Vitest + @testing-library/react + jsdom, configured in `vite.config.ts` and `vitest.setup.ts`. 90 tests across 4 files.
 
 ## Architecture
 
@@ -32,7 +34,7 @@ Single-page trip planner with no router library. `App.tsx` (~620 lines) is the c
 
 **State flow:** `useTripLibrary` hook → `App.tsx` local `trip` state → props down to components → callbacks up. No context, no Zustand, no Redux.
 
-**Persistence:** `useTripLibrary` stores `Trip[]` in localStorage (`tt_trips_v1`) and active trip ID (`tt_active_trip_v1`). On first launch, the seed trip ("京都赏枫5日") is used as default data.
+**Persistence:** `useTripLibrary` wraps `Trip[]` in a v2 `StorageEnvelope` (version, savedAt, tripCount, trips) and dual-writes to localStorage primary key (`tt_trips_v2`) + backup key (`tt_trips_backup_v2`). Active trip ID stored in `tt_active_trip_v2`. v1→v2 auto-migration on first load. Export uses `.ajourney` files with `ExportEnvelope` format (schemaVersion, appVersion, exportedAt, trips, tripCount).
 
 ## Data Model (`src/types/index.ts`)
 
@@ -49,7 +51,13 @@ Option { id, name, emoji, tags[], highlight?, address?, openHours?, ticketPrice?
 |------|------|
 | `src/App.tsx` | All state, all CRUD callbacks, view routing |
 | `src/types/index.ts` | TypeScript interfaces for all data |
-| `src/hooks/useTripLibrary.ts` | localStorage persistence, multi-trip CRUD |
+| `src/hooks/useTripLibrary.ts` | localStorage persistence, multi-trip CRUD, v1→v2 migration, import/export |
+| `src/services/storage.ts` | StorageEnvelope wrap/read/write, integrity verification, stats |
+| `src/services/export.ts` | ExportEnvelope build, filename sanitize, JSON download |
+| `src/services/import.ts` | Envelope validation, conflict detection, import apply/fork |
+| `src/components/settings/SettingsPanel.tsx` | Full-screen settings overlay (storage, export, import, clear) |
+| `src/components/settings/ExportDialog.tsx` | Export modal with trip scope selection |
+| `src/components/settings/ImportDialog.tsx` | Three-stage import modal (file → preview → conflict resolution) |
 | `src/data/seed.ts` | Seed/template trip data ("京都赏枫5日") |
 | `src/data/constants.ts` | TYPE_META, TRANSPORT_META, SCENARIO_META, weather presets |
 | `src/utils/transforms.ts` | Day-level ops: recalcDay, sortByStart, flagConflicts, nextStartFor |
