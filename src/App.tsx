@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { flushSync } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import type { Mode, Block, Day, BlockType, BlockStatus, SwapReason, TransportMode } from '@/types'
+import type { Trip, Mode, Block, Day, BlockType, BlockStatus, SwapReason, TransportMode, ConflictDecision } from '@/types'
 import { SCENARIO_META, TRANSPORT_META } from '@/data/constants'
 import { useAnimation } from '@/hooks/useAnimation'
 import { cloneTrip, forkTrip } from '@/utils/clone'
@@ -29,10 +29,18 @@ import DayPanel from '@/components/trip/DayPanel'
 import HomeView from '@/components/home/HomeView'
 import MarketplaceView from '@/components/home/MarketplaceView'
 import TripCreateDialog from '@/components/home/TripCreateDialog'
+import SettingsPanel from '@/components/settings/SettingsPanel'
+import ExportDialog from '@/components/settings/ExportDialog'
+import ImportDialog from '@/components/settings/ImportDialog'
 import usePublished from '@/hooks/usePublished'
 
 export default function App() {
-  const { trips, activeTripId, setActiveTrip, saveTrip, createTrip, deleteTrip, getTrip } = useTripLibrary()
+  const {
+    trips, activeTripId, setActiveTrip, saveTrip, createTrip, deleteTrip, getTrip,
+    exportTripsJSON, importTripsJSON, resolveImportConflicts,
+    getStorageStats, verifyIntegrity, clearTripData,
+    importVersion,
+  } = useTripLibrary()
   const { tr: animTr } = useAnimation()
 
   const initialTrip = useMemo(() => {
@@ -43,6 +51,14 @@ export default function App() {
 
   // Sync trip back to library whenever it changes
   useEffect(() => { if (trip?.id) saveTrip(trip) }, [trip, saveTrip])
+
+  // Reload active trip from library after import
+  useEffect(() => {
+    if (activeTripId) {
+      const fresh = getTrip(activeTripId)
+      if (fresh) setTrip(cloneTrip(fresh))
+    }
+  }, [importVersion])
 
   const baseline = useMemo(() => cloneTrip(trip), [trip])
   const baselineTotals = useMemo(() => tripTotals(baseline), [baseline])
@@ -75,6 +91,11 @@ export default function App() {
   const [showTrip, setShowTrip] = useState(false)
   const [dayPanel, setDayPanel] = useState<number | null>(null)
   const [showCreateTrip, setShowCreateTrip] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showExportDialog, setShowExportDialog] = useState(false)
+  const [showImportDialog, setShowImportDialog] = useState(false)
+  const [storageStats, setStorageStats] = useState<ReturnType<typeof getStorageStats> | null>(null)
+  const [integrityResult, setIntegrityResult] = useState<{ ok: boolean; error?: string } | null>(null)
   const [marketplace, setMarketplace] = useState(false)
   const [nickname, setNickname] = useState(() => {
     try { return localStorage.getItem('tt_nickname') || 'momo' } catch { return 'momo' }
@@ -180,6 +201,46 @@ export default function App() {
     const source = getTrip(id)
     if (source) handleCreateTrip(forkTrip(source))
   }, [getTrip, handleCreateTrip])
+
+  const handleOpenSettings = useCallback(() => {
+    setStorageStats(getStorageStats())
+    setIntegrityResult(null)
+    setShowSettings(true)
+  }, [getStorageStats])
+
+  const handleVerifyIntegrity = useCallback(() => {
+    const result = verifyIntegrity()
+    setIntegrityResult(result)
+  }, [verifyIntegrity])
+
+  const handleExport = useCallback((scope: 'current' | 'all') => {
+    if (scope === 'current' && trip?.id) {
+      exportTripsJSON([trip.id])
+    } else {
+      exportTripsJSON()
+    }
+    setShowExportDialog(false)
+  }, [exportTripsJSON, trip])
+
+  const handleImportFile = useCallback((json: string) => {
+    return importTripsJSON(json)
+  }, [importTripsJSON])
+
+  const handleConfirmImport = useCallback((importTrips: Trip[], decisions: ConflictDecision[]) => {
+    resolveImportConflicts(importTrips, decisions)
+    setShowImportDialog(false)
+  }, [resolveImportConflicts])
+
+  const handleClearData = useCallback(() => {
+    clearTripData()
+    setShowSettings(false)
+    setTrip({
+      id: '', title: '', subtitle: '', destinationCity: '',
+      coverEmoji: '', coverId: '', coverColor: '#FF8A4C',
+      dateRange: '', party: '', days: [],
+    } as Trip)
+    setView('home')
+  }, [clearTripData])
 
   useEffect(() => {
     if (trips.length === 0) setView('home')
@@ -746,6 +807,7 @@ export default function App() {
             onForkTemplate={handleForkTemplate}
             onDuplicateTrip={handleDuplicateTrip}
             onOpenMarketplace={() => setMarketplace(true)}
+            onOpenSettings={handleOpenSettings}
           />
           )
         ) : (
@@ -878,6 +940,37 @@ export default function App() {
         <TripCreateDialog
           onConfirm={handleCreateTrip}
           onCancel={() => setShowCreateTrip(false)}
+        />
+      )}
+
+      {showSettings && (
+        <SettingsPanel
+          stats={storageStats}
+          integrity={integrityResult}
+          onVerifyIntegrity={handleVerifyIntegrity}
+          onExport={() => { setShowSettings(false); setShowExportDialog(true) }}
+          onImport={() => { setShowSettings(false); setShowImportDialog(true) }}
+          onClearData={handleClearData}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showExportDialog && (
+        <ExportDialog
+          open={showExportDialog}
+          tripCount={trips.length}
+          currentTripTitle={trip?.title ?? ''}
+          onExport={handleExport}
+          onClose={() => setShowExportDialog(false)}
+        />
+      )}
+
+      {showImportDialog && (
+        <ImportDialog
+          open={showImportDialog}
+          onImportFile={handleImportFile}
+          onConfirmImport={handleConfirmImport}
+          onClose={() => setShowImportDialog(false)}
         />
       )}
 

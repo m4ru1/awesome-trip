@@ -14,6 +14,7 @@ interface Props {
   onForkTemplate?: () => void
   onDuplicateTrip?: (id: string) => void
   onOpenMarketplace?: () => void
+  onOpenSettings?: () => void
 }
 
 function tripSummary(t: Trip): string {
@@ -25,7 +26,7 @@ function tripSummary(t: Trip): string {
   return parts.join(' · ')
 }
 
-export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTrip, onForkTemplate, onDuplicateTrip, onOpenMarketplace }: Props): ReactNode {
+export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTrip, onForkTemplate, onDuplicateTrip, onOpenMarketplace, onOpenSettings }: Props): ReactNode {
   const [deleting, setDeleting] = useState<string | null>(null)
   const { enabled } = useAnimation()
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
@@ -38,6 +39,11 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
       >
         <span className="title-cn flex-1 text-[22px] font-extrabold text-ink max-[860px]:text-[18px]">旅行课程表</span>
         <span className="text-2xl">{'✈️'}</span>
+        {onOpenSettings && (
+          <button onClick={onOpenSettings} className="btn btn-ghost h-9 w-9 !p-0 text-lg" title="设置">
+            {'⚙️'}
+          </button>
+        )}
         {onOpenMarketplace && (
           <button onClick={onOpenMarketplace} className="btn btn-ghost h-9 !px-3 text-sm font-bold">
             🏪 市场
