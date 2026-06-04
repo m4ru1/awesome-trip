@@ -61,3 +61,5 @@ export const EMOJI_CATEGORIES: EmojiCategory[] = [
   { id: 'faces', zh: '表情', emojis: ['😊','😎','🤩','😴','🥳','😋','🤗','🥰','😌','😅','😤','😢'] },
   { id: 'other', zh: '其他', emojis: ['✨','❤️','💡','📍','📌','🎁','💎','✅','❌','🔔','📋','🏷️','🧳','🎒','📱','💰','⏰'] },
 ]
+
+export const APP_VERSION = '1.0.0'
