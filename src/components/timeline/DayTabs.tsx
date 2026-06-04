@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useRef, useEffect, type ReactNode } from 'react'
 import { motion } from 'motion/react'
 import { useAnimation } from '@/hooks/useAnimation'
 import type { Trip } from '@/types'
@@ -21,6 +21,14 @@ export default function DayTabs({
   editable = false,
 }: Props): ReactNode {
   const { enabled } = useAnimation()
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+  useEffect(() => {
+    const el = tabRefs.current[activeIdx]
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    }
+  }, [activeIdx])
 
   return (
     <div
@@ -58,7 +66,14 @@ export default function DayTabs({
             }}
           >
             <button
-              onClick={() => onPick(di)}
+              ref={el => { tabRefs.current[di] = el }}
+              onClick={() => {
+                if (di === activeIdx && editable && onDayHeaderClick) {
+                  onDayHeaderClick(di)
+                } else {
+                  onPick(di)
+                }
+              }}
               style={{
                 border: 'none',
                 cursor: 'pointer',
@@ -139,30 +154,17 @@ export default function DayTabs({
                   </div>
                 </>
               )}
+              {active && editable && onDayHeaderClick && (
+                <div style={{
+                  position: 'absolute',
+                  top: -2,
+                  right: -6,
+                  fontSize: 10,
+                  opacity: 0.7,
+                }}>✎</div>
+              )}
               </div>
             </button>
-            {onDayHeaderClick && (
-              <button
-                onClick={e => { e.stopPropagation(); onDayHeaderClick(di) }}
-                title="编辑天气"
-                style={{
-                  border: 'none',
-                  cursor: 'pointer',
-                  borderRadius: 10,
-                  width: 36,
-                  height: 36,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: active ? 'rgba(255,255,255,.25)' : 'rgba(0,0,0,.04)',
-                  color: active ? '#fff' : 'var(--color-ink2)',
-                  fontSize: 13,
-                  flexShrink: 0,
-                }}
-              >
-                ✎
-              </button>
-            )}
           </div>
         )
       })}

@@ -22,11 +22,13 @@ interface Props {
   onSync: () => void
   onRestore: () => void
   onUnpublish: () => void
+  onScroll?: (scrollTop: number) => void
 }
 
 export default function ShareView({
   trip, published, dirty, publishing, version, shareCode, nickname,
   onNicknameChange, onPublish, onSync, onRestore, onUnpublish,
+  onScroll,
 }: Props) {
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
   const totals = useMemo(() => tripTotals(trip), [trip])
@@ -41,7 +43,8 @@ export default function ShareView({
   }
 
   return (
-    <motion.div ref={rubberRef} className="overscroll-none h-full overflow-y-auto bg-paper2" style={{ y: rubberY }}>
+    <motion.div ref={rubberRef} className="overscroll-none h-full overflow-y-auto bg-paper2" style={{ y: rubberY }}
+      onScroll={onScroll ? (e) => onScroll(e.currentTarget.scrollTop) : undefined}>
       {/* Action bar */}
       <div className="sticky top-0 z-5 flex flex-col gap-2 bg-[rgba(251,239,226,.86)] p-3" style={{ backdropFilter: 'blur(8px)' }}>
         {/* Nickname row */}

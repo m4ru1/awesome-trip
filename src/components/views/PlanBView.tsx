@@ -19,9 +19,10 @@ interface Props {
   onApplyScenario: (reason: SwapReason) => void
   onSetPrimaryAt: (dayIdx: number, blockIdx: number, altIdx: number) => void
   onReset: () => void
+  onScroll?: (scrollTop: number) => void
 }
 
-export default function PlanBView({ trip, baselineTrip, baselineTotals, onApplyScenario, onSetPrimaryAt, onReset }: Props) {
+export default function PlanBView({ trip, baselineTrip, baselineTotals, onApplyScenario, onSetPrimaryAt, onReset, onScroll }: Props) {
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
   const list = useMemo(() => planBStats(trip), [trip])
   const current = useMemo(() => tripTotals(trip), [trip])
@@ -40,7 +41,8 @@ export default function PlanBView({ trip, baselineTrip, baselineTotals, onApplyS
   }
 
   return (
-    <motion.div ref={rubberRef} className="overscroll-none mx-auto h-full max-w-[1000px] overflow-y-auto px-5 pb-10 pt-[18px]" style={{ y: rubberY }}>
+    <motion.div ref={rubberRef} className="overscroll-none mx-auto h-full max-w-[1000px] overflow-y-auto px-5 pb-10 pt-[18px]" style={{ y: rubberY }}
+      onScroll={onScroll ? (e) => onScroll(e.currentTarget.scrollTop) : undefined}>
       <div className="flex flex-wrap items-baseline gap-2.5">
         <h2 className="title-cn m-0 text-[26px]">Plan B · 备选总览</h2>
         <span className="text-[13px] text-ink2">共 {list.length} 个块带备选，按场景一键切换</span>

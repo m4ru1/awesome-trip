@@ -1,7 +1,9 @@
 import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react'
-import { motion } from 'motion/react'
+import { motion, AnimatePresence } from 'motion/react'
 import { useAnimation } from '@/hooks/useAnimation'
 import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
+import { useSwipe } from '@/hooks/useSwipe'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import type { Trip, Mode, TransportMode } from '@/types'
 import { TYPE_META, TRANSPORT_META } from '@/data/constants'
 import { parseTransportMin } from '@/utils/time'
@@ -31,6 +33,7 @@ interface Props {
     nextBlockIdx: number | null
   } | null
   onScroll?: (scrollTop: number) => void
+  onSetActiveDay?: (idx: number) => void
 }
 
 /** Small transport connector rendered between two adjacent blocks. */
@@ -111,9 +114,11 @@ export default function DayTimeline({
   transportBinder: _transportBinder,
   nowInfo,
   onScroll,
+  onSetActiveDay,
 }: Props): ReactNode {
   const { enabled } = useAnimation()
   const { ref: rubberRef, y: rubberY } = useWheelRubberBand()
+  const isMob = useIsMobile()
   const day = trip.days[activeIdx]
   if (!day) return null
 
@@ -131,6 +136,38 @@ export default function DayTimeline({
     nowInfo?.nextBlockIdx != null
       ? blocks[nowInfo.nextBlockIdx]
       : null
+
+  /* ── Swipe day switching (mobile only) ── */
+  const [swipeDir, setSwipeDir] = useState<1 | -1>(1)
+  const swipeGuard = useRef(false)
+  const swipeGuardTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: () => {
+      if (activeIdx < trip.days.length - 1 && onSetActiveDay) {
+        setSwipeDir(1)
+        onSetActiveDay(activeIdx + 1)
+        swipeGuard.current = true
+        if (swipeGuardTimer.current) clearTimeout(swipeGuardTimer.current)
+        swipeGuardTimer.current = setTimeout(() => { swipeGuard.current = false }, 300)
+      }
+    },
+    onSwipeRight: () => {
+      if (activeIdx > 0 && onSetActiveDay) {
+        setSwipeDir(-1)
+        onSetActiveDay(activeIdx - 1)
+        swipeGuard.current = true
+        if (swipeGuardTimer.current) clearTimeout(swipeGuardTimer.current)
+        swipeGuardTimer.current = setTimeout(() => { swipeGuard.current = false }, 300)
+      }
+    },
+  })
+
+  const touchHandlers = isMob ? {
+    onTouchStart: swipeHandlers.onTouchStart,
+    onTouchMove: swipeHandlers.onTouchMove,
+    onTouchEnd: swipeHandlers.onTouchEnd,
+  } : {}
 
   /* ── Pointer-based drag reorder ── */
   const [dragIdx, setDragIdx] = useState<number | null>(null)
@@ -222,7 +259,7 @@ export default function DayTimeline({
     }
   }, [])
 
-  const openBlock = guard
+  const openBlock = (guard || swipeGuard.current)
     ? () => {}
     : (d: number, b: number) => onOpenBlock(d, b)
 
@@ -238,196 +275,208 @@ export default function DayTimeline({
         y: rubberY,
       }}
       onScroll={onScroll ? (e) => onScroll(e.currentTarget.scrollTop) : undefined}
+      {...touchHandlers}
     >
-      {/* Execute mode: "Now" card at the top */}
-      {mode === 'execute' && (
-        <ExecuteNowCard
-          block={nowBlock}
-          nextBlock={nextBlock}
-          onOpenBlock={
-            nowInfo?.blockIdx != null
-              ? () => onOpenBlock(activeIdx, nowInfo.blockIdx!)
-              : undefined
-          }
-        />
-      )}
+      <AnimatePresence mode="popLayout" custom={swipeDir}>
+        <motion.div
+          key={activeIdx}
+          custom={swipeDir}
+          initial={isMob && enabled ? { x: swipeDir * 300, opacity: 0 } : false}
+          animate={{ x: 0, opacity: 1 }}
+          exit={isMob && enabled ? { x: swipeDir * -300, opacity: 0 } : undefined}
+          transition={{ type: 'spring', stiffness: 250, damping: 28 }}
+        >
+          {/* Execute mode: "Now" card at the top */}
+          {mode === 'execute' && (
+            <ExecuteNowCard
+              block={nowBlock}
+              nextBlock={nextBlock}
+              onOpenBlock={
+                nowInfo?.blockIdx != null
+                  ? () => onOpenBlock(activeIdx, nowInfo.blockIdx!)
+                  : undefined
+              }
+            />
+          )}
 
-      <div style={{ padding: '10px 14px 0' }}>
-        {blocks.map((b, pos) => {
-          const meta = TYPE_META[b.type]
-          const realIdx = pos
-          const isNow =
-            nowInfo?.blockIdx === realIdx &&
-            mode === 'execute'
+          <div style={{ padding: '10px 14px 0' }}>
+            {blocks.map((b, pos) => {
+              const meta = TYPE_META[b.type]
+              const realIdx = pos
+              const isNow =
+                nowInfo?.blockIdx === realIdx &&
+                mode === 'execute'
 
-          const isDragging = dragIdx === realIdx
-          const isHoverTarget = hoverIdx === realIdx && dragIdx !== null && dragIdx !== realIdx
+              const isDragging = dragIdx === realIdx
+              const isHoverTarget = hoverIdx === realIdx && dragIdx !== null && dragIdx !== realIdx
 
-          // Calculate visual offset: dragged card follows pointer, others shift to make room
-          let translateY = 0
-          if (isDragging) {
-            translateY = dragDeltaY
-          } else if (dragIdx !== null && hoverIdx !== null) {
-            // Non-dragged cards shift to make room
-            if (dragIdx < hoverIdx && realIdx > dragIdx && realIdx <= hoverIdx) {
-              // Moving down: cards between dragIdx+1 and hoverIdx shift up
-              const dragEl = rowRefs.current[dragIdx]
-              translateY = dragEl ? -dragEl.offsetHeight : 0
-            } else if (dragIdx > hoverIdx && realIdx >= hoverIdx && realIdx < dragIdx) {
-              // Moving up: cards between hoverIdx and dragIdx-1 shift down
-              const dragEl = rowRefs.current[dragIdx]
-              translateY = dragEl ? dragEl.offsetHeight : 0
-            }
-          }
+              // Calculate visual offset: dragged card follows pointer, others shift to make room
+              let translateY = 0
+              if (isDragging) {
+                translateY = dragDeltaY
+              } else if (dragIdx !== null && hoverIdx !== null) {
+                // Non-dragged cards shift to make room
+                if (dragIdx < hoverIdx && realIdx > dragIdx && realIdx <= hoverIdx) {
+                  // Moving down: cards between dragIdx+1 and hoverIdx shift up
+                  const dragEl = rowRefs.current[dragIdx]
+                  translateY = dragEl ? -dragEl.offsetHeight : 0
+                } else if (dragIdx > hoverIdx && realIdx >= hoverIdx && realIdx < dragIdx) {
+                  // Moving up: cards between hoverIdx and dragIdx-1 shift down
+                  const dragEl = rowRefs.current[dragIdx]
+                  translateY = dragEl ? dragEl.offsetHeight : 0
+                }
+              }
 
-          return (
-            <motion.div
-              key={b.id}
-              ref={el => { rowRefs.current[realIdx] = el }}
-              layout={enabled}
-              transition={enabled ? { type: 'spring', stiffness: 400, damping: 30, mass: 1 } : { duration: 0 }}
-              style={{
-                transition: isDragging ? 'none' : 'transform .22s var(--ease-spring)',
-                transform: translateY ? `translateY(${translateY}px)` : undefined,
-                zIndex: isDragging ? 30 : undefined,
-                position: 'relative',
-                opacity: isDragging ? 0.92 : 1,
-                pointerEvents: isDragging ? 'none' : undefined,
-              }}
-            >
-              {/* Block row: time gutter + card */}
+              return (
+                <motion.div
+                  key={b.id}
+                  ref={el => { rowRefs.current[realIdx] = el }}
+                  layout={enabled}
+                  transition={enabled ? { type: 'spring', stiffness: 400, damping: 30, mass: 1 } : { duration: 0 }}
+                  style={{
+                    transition: isDragging ? 'none' : 'transform .22s var(--ease-spring)',
+                    transform: translateY ? `translateY(${translateY}px)` : undefined,
+                    zIndex: isDragging ? 30 : undefined,
+                    position: 'relative',
+                    opacity: isDragging ? 0.92 : 1,
+                    pointerEvents: isDragging ? 'none' : undefined,
+                  }}
+                >
+                  {/* Block row: time gutter + card */}
+                  <div
+                    style={{ display: 'flex', gap: 11 }}
+                  >
+                    {/* Left time gutter */}
+                    <div
+                      style={{
+                        width: 46,
+                        flexShrink: 0,
+                        textAlign: 'right',
+                        position: 'relative',
+                      }}
+                    >
+                      <div
+                        className="num"
+                        style={{
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          color: meta.color,
+                        }}
+                      >
+                        {b.startTime}
+                      </div>
+                      <div
+                        className="num"
+                        style={{
+                          fontSize: 11,
+                          color: 'var(--color-ink3)',
+                        }}
+                      >
+                        {b.endTime !== '次日'
+                          ? b.endTime
+                          : ''}
+                      </div>
+                      {/* Drag grip handle (plan mode only) */}
+                      {editable && (
+                        <div
+                          title="按住拖动重排"
+                          className="no-select"
+                          onPointerDown={e => handlePointerDown(e, realIdx)}
+                          onPointerMove={handlePointerMove}
+                          onPointerUp={handlePointerUp}
+                          onPointerCancel={handlePointerUp}
+                          style={{
+                            fontSize: 15,
+                            color: isHoverTarget ? 'var(--color-brand)' : 'var(--color-ink3)',
+                            marginTop: 7,
+                            cursor: 'grab',
+                            touchAction: 'none',
+                            lineHeight: 1,
+                            transition: 'color .15s',
+                            padding: 10,
+                            margin: '1px -10px 0 0',
+                          }}
+                        >
+                          ⠿
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Block card */}
+                    <div
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        paddingBottom: 4,
+                      }}
+                    >
+                      <BlockCard
+                        block={b}
+                        mode={mode}
+                        nowState={
+                          isNow ? 'current' : null
+                        }
+                        onClick={() =>
+                          openBlock(activeIdx, realIdx)
+                        }
+                        isDragging={isDragging}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Transport connector between blocks */}
+                  {pos < blocks.length - 1 && (
+                    <TransportIndicator
+                      transport={b.transportToNext}
+                    />
+                  )}
+                </motion.div>
+              )
+            })}
+
+            {/* Add block button (plan mode only) */}
+            {editable && onAddBlock && (
               <div
-                style={{ display: 'flex', gap: 11 }}
+                style={{
+                  display: 'flex',
+                  gap: 11,
+                  marginTop: 4,
+                }}
               >
-                {/* Left time gutter */}
                 <div
                   style={{
                     width: 46,
                     flexShrink: 0,
-                    textAlign: 'right',
-                    position: 'relative',
                   }}
-                >
-                  <div
-                    className="num"
-                    style={{
-                      fontSize: 12.5,
-                      fontWeight: 700,
-                      color: meta.color,
-                    }}
-                  >
-                    {b.startTime}
-                  </div>
-                  <div
-                    className="num"
-                    style={{
-                      fontSize: 11,
-                      color: 'var(--color-ink3)',
-                    }}
-                  >
-                    {b.endTime !== '次日'
-                      ? b.endTime
-                      : ''}
-                  </div>
-                  {/* Drag grip handle (plan mode only) */}
-                  {editable && (
-                    <div
-                      title="按住拖动重排"
-                      className="no-select"
-                      onPointerDown={e => handlePointerDown(e, realIdx)}
-                      onPointerMove={handlePointerMove}
-                      onPointerUp={handlePointerUp}
-                      onPointerCancel={handlePointerUp}
-                      style={{
-                        fontSize: 15,
-                        color: isHoverTarget ? 'var(--color-brand)' : 'var(--color-ink3)',
-                        marginTop: 7,
-                        cursor: 'grab',
-                        touchAction: 'none',
-                        lineHeight: 1,
-                        transition: 'color .15s',
-                        padding: 10,
-                        margin: '1px -10px 0 0',
-                      }}
-                    >
-                      ⠿
-                    </div>
-                  )}
-                </div>
-
-                {/* Block card */}
-                <div
+                />
+                <button
+                  onClick={() => onAddBlock(activeIdx)}
                   style={{
                     flex: 1,
-                    minWidth: 0,
-                    paddingBottom: 4,
+                    cursor: 'pointer',
+                    border: '1.5px dashed #D8C7B2',
+                    borderRadius: 16,
+                    background:
+                      'rgba(255,255,255,.6)',
+                    color: 'var(--color-ink2)',
+                    fontFamily:
+                      'var(--font-cn-body)',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    padding: '13px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
                   }}
                 >
-                  <BlockCard
-                    block={b}
-                    mode={mode}
-                    nowState={
-                      isNow ? 'current' : null
-                    }
-                    onClick={() =>
-                      openBlock(activeIdx, realIdx)
-                    }
-                    isDragging={isDragging}
-                  />
-                </div>
+                  ＋ 加一项行程
+                </button>
               </div>
-
-              {/* Transport connector between blocks */}
-              {pos < blocks.length - 1 && (
-                <TransportIndicator
-                  transport={b.transportToNext}
-                />
-              )}
-            </motion.div>
-          )
-        })}
-
-        {/* Add block button (plan mode only) */}
-        {editable && onAddBlock && (
-          <div
-            style={{
-              display: 'flex',
-              gap: 11,
-              marginTop: 4,
-            }}
-          >
-            <div
-              style={{
-                width: 46,
-                flexShrink: 0,
-              }}
-            />
-            <button
-              onClick={() => onAddBlock(activeIdx)}
-              style={{
-                flex: 1,
-                cursor: 'pointer',
-                border: '1.5px dashed #D8C7B2',
-                borderRadius: 16,
-                background:
-                  'rgba(255,255,255,.6)',
-                color: 'var(--color-ink2)',
-                fontFamily:
-                  'var(--font-cn-body)',
-                fontWeight: 700,
-                fontSize: 14,
-                padding: '13px 0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 6,
-              }}
-            >
-              ＋ 加一项行程
-            </button>
+            )}
           </div>
-        )}
-      </div>
+        </motion.div>
+      </AnimatePresence>
     </motion.div>
   )
 }

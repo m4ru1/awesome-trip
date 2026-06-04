@@ -6,7 +6,7 @@ import { SCENARIO_META, TRANSPORT_META } from '@/data/constants'
 import { useAnimation } from '@/hooks/useAnimation'
 import { cloneTrip, forkTrip } from '@/utils/clone'
 import { SEED_TRIP } from '@/data/seed'
-import { toMin, parseTransportMin } from '@/utils/time'
+import { toMin, parseTransportMin, parseDateRange } from '@/utils/time'
 import { flagConflicts, sortByStart, nextStartFor, shiftFrom, recalcDay } from '@/utils/transforms'
 import { tripTotals } from '@/utils/totals'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -59,7 +59,7 @@ export default function App() {
   const { collapsed: scrollCollapsed, onScroll: onTimelineScroll, reset: resetScrollCollapse } = useScrollCollapse()
 
   // Collapse mobile toolbar when scrolling down, unless in a mode that needs it
-  const toolbarCollapsed = isMobile && (scrollCollapsed || !!open) && mode !== 'execute' && mode !== 'share' && !planB
+  const toolbarCollapsed = isMobile && (scrollCollapsed || !!open)
   const [nowMin, setNowMin] = useState(14 * 60)
   const [toast, setToast] = useState<string | null>(null)
   const [editing, setEditing] = useState<{
@@ -115,21 +115,41 @@ export default function App() {
   const handleCreateTrip = useCallback((newTrip: typeof trip) => {
     const wk = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
     const today = new Date()
-    const tripWithDay = newTrip.days.length === 0
-      ? {
-          ...newTrip,
-          days: [{
-            id: 'd' + Date.now(),
-            dateLabel: `${today.getMonth() + 1}/${today.getDate()}`,
-            weekday: wk[today.getDay()],
-            weatherHint: '待定',
-            weatherIcon: '🌤️',
-            temperature: null,
-            subtitle: undefined,
-            blocks: [],
-          }],
-        }
-      : newTrip
+    let days: Day[] = []
+
+    const range = parseDateRange(newTrip.dateRange)
+    if (range) {
+      const msDay = 86400000
+      const count = Math.min(Math.round((range.end.getTime() - range.start.getTime()) / msDay) + 1, 30)
+      for (let i = 0; i < count; i++) {
+        const d = new Date(range.start.getTime() + i * msDay)
+        days.push({
+          id: 'd' + Date.now() + i,
+          dateLabel: `${d.getMonth() + 1}/${d.getDate()}`,
+          weekday: wk[d.getDay()],
+          weatherHint: '待定',
+          weatherIcon: '🌤️',
+          temperature: null,
+          subtitle: undefined,
+          blocks: [],
+        })
+      }
+    }
+
+    if (days.length === 0) {
+      days = [{
+        id: 'd' + Date.now(),
+        dateLabel: `${today.getMonth() + 1}/${today.getDate()}`,
+        weekday: wk[today.getDay()],
+        weatherHint: '待定',
+        weatherIcon: '🌤️',
+        temperature: null,
+        subtitle: undefined,
+        blocks: [],
+      }]
+    }
+
+    const tripWithDay = { ...newTrip, days }
     createTrip(tripWithDay)
     setTrip(cloneTrip(tripWithDay))
     setView('trip')
@@ -402,7 +422,7 @@ export default function App() {
     if (last) {
       const m = /(\d{1,2})\/(\d{1,2})/.exec(last.dateLabel)
       if (m) {
-        const d = new Date(2025, +m[1] - 1, +m[2])
+        const d = new Date(new Date().getFullYear(), +m[1] - 1, +m[2])
         d.setDate(d.getDate() + 1)
         return { dateLabel: `${d.getMonth() + 1}/${d.getDate()}`, weekday: wk[d.getDay()] }
       }
@@ -735,7 +755,8 @@ export default function App() {
             transition={animTr({ duration: 0.2, ease: 'easeOut' })}
           >
           <PlanBView trip={trip} baselineTrip={baseline} baselineTotals={baselineTotals}
-            onApplyScenario={applyScenario} onSetPrimaryAt={setPrimaryAtGlobal} onReset={resetPlan} />
+            onApplyScenario={applyScenario} onSetPrimaryAt={setPrimaryAtGlobal} onReset={resetPlan}
+            onScroll={onTimelineScroll} />
           </motion.div>
         ) : mode === 'share' ? (
           <motion.div key="share" className="h-full"
@@ -757,6 +778,7 @@ export default function App() {
             onSync={handleSync}
             onRestore={handleRestore}
             onUnpublish={handleUnpublish}
+            onScroll={onTimelineScroll}
           />
           </motion.div>
         ) : showGrid ? (
@@ -787,7 +809,7 @@ export default function App() {
                 onOpenBlock={(d, b) => setOpen({ dayIdx: d, blockIdx: b })}
                 onReorderIds={reorderDayByIds} onAddBlock={openCreate}
                 transportBinder={bindTransport} nowInfo={nowInfo}
-                onScroll={onTimelineScroll} />
+                onScroll={onTimelineScroll} onSetActiveDay={setActiveDay} />
             </div>
           </motion.div>
         )}

@@ -43,6 +43,27 @@ export function totalTransportMin(chain: Transport[]): number {
   return total
 }
 
+export function parseDateRange(s: string): { start: Date; end: Date } | null {
+  if (!s) return null
+  const str = s.trim()
+  const parts = str.split(/[–\-~—至到]/).map(p => p.trim())
+  if (parts.length !== 2) return null
+
+  const parseDate = (raw: string): Date | null => {
+    const cn = raw.match(/(\d{1,2})月(\d{1,2})日?/)
+    if (cn) return new Date(new Date().getFullYear(), +cn[1] - 1, +cn[2])
+    const slash = raw.match(/(\d{1,2})\/(\d{1,2})/)
+    if (slash) return new Date(new Date().getFullYear(), +slash[1] - 1, +slash[2])
+    return null
+  }
+
+  const start = parseDate(parts[0])
+  let end = parseDate(parts[1])
+  if (!start || !end) return null
+  if (end <= start) end = new Date(end.getFullYear() + 1, end.getMonth(), end.getDate())
+  return { start, end }
+}
+
 export function parseOpenHours(s: string): { open: number; close: number } | null {
   if (!s) return null
   const m = String(s).match(/(\d{1,2}:\d{2})\s*[–\-~至]\s*(\d{1,2}:\d{2})/)
