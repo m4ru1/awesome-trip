@@ -1,4 +1,4 @@
-import type { Trip, StorageEnvelope, StorageStats } from '@/types'
+import type { Trip, StorageEnvelope, StorageStats, IntegrityResult } from '@/types'
 
 export function wrapEnvelope(trips: Trip[]): StorageEnvelope {
   return {
@@ -15,7 +15,10 @@ export function readEnvelope(key: string): StorageEnvelope | null {
     if (!raw) return null
     const data = JSON.parse(raw)
     if (!data || typeof data !== 'object') return null
-    return data as StorageEnvelope
+    const envelope = data as StorageEnvelope
+    const result = verifyEnvelope(envelope)
+    if (!result.ok) return null
+    return envelope
   } catch {
     return null
   }
@@ -26,16 +29,23 @@ export function writeEnvelope(key: string, trips: Trip[]): void {
   localStorage.setItem(key, JSON.stringify(envelope))
 }
 
-export function verifyEnvelope(envelope: StorageEnvelope): boolean {
-  if (typeof envelope.version !== 'number' || envelope.version < 2) return false
-  if (!Array.isArray(envelope.trips)) return false
-  if (envelope.trips.length !== envelope.tripCount) return false
-  for (const t of envelope.trips) {
-    if (!t || typeof t.id !== 'string' || typeof t.title !== 'string' || !Array.isArray(t.days)) {
-      return false
-    }
+export function verifyEnvelope(envelope: StorageEnvelope): IntegrityResult {
+  if (typeof envelope.version !== 'number' || envelope.version < 2)
+    return { ok: false, error: 'Unsupported or missing version' }
+  if (!Array.isArray(envelope.trips))
+    return { ok: false, error: 'trips is not an array' }
+  if (envelope.trips.length !== envelope.tripCount)
+    return { ok: false, error: 'tripCount does not match trips.length' }
+  for (let i = 0; i < envelope.trips.length; i++) {
+    const t = envelope.trips[i]
+    if (!t || typeof t.id !== 'string')
+      return { ok: false, error: `Trip at index ${i} is missing id` }
+    if (typeof t.title !== 'string')
+      return { ok: false, error: `Trip "${t.id}" is missing title` }
+    if (!Array.isArray(t.days))
+      return { ok: false, error: `Trip "${t.id}" is missing days array` }
   }
-  return true
+  return { ok: true }
 }
 
 export function getStorageStats(): StorageStats {
