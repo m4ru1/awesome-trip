@@ -115,38 +115,41 @@ export default function App() {
   const handleCreateTrip = useCallback((newTrip: typeof trip) => {
     const wk = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
     const today = new Date()
-    let days: Day[] = []
+    let days = newTrip.days
 
-    const range = parseDateRange(newTrip.dateRange)
-    if (range) {
-      const msDay = 86400000
-      const count = Math.min(Math.round((range.end.getTime() - range.start.getTime()) / msDay) + 1, 30)
-      for (let i = 0; i < count; i++) {
-        const d = new Date(range.start.getTime() + i * msDay)
-        days.push({
-          id: 'd' + Date.now() + i,
-          dateLabel: `${d.getMonth() + 1}/${d.getDate()}`,
-          weekday: wk[d.getDay()],
+    if (days.length === 0) {
+      days = []
+      const range = parseDateRange(newTrip.dateRange)
+      if (range) {
+        const msDay = 86400000
+        const count = Math.min(Math.round((range.end.getTime() - range.start.getTime()) / msDay) + 1, 30)
+        for (let i = 0; i < count; i++) {
+          const d = new Date(range.start.getTime() + i * msDay)
+          days.push({
+            id: 'd' + Date.now() + i,
+            dateLabel: `${d.getMonth() + 1}/${d.getDate()}`,
+            weekday: wk[d.getDay()],
+            weatherHint: '待定',
+            weatherIcon: '🌤️',
+            temperature: null,
+            subtitle: undefined,
+            blocks: [],
+          })
+        }
+      }
+
+      if (days.length === 0) {
+        days = [{
+          id: 'd' + Date.now(),
+          dateLabel: `${today.getMonth() + 1}/${today.getDate()}`,
+          weekday: wk[today.getDay()],
           weatherHint: '待定',
           weatherIcon: '🌤️',
           temperature: null,
           subtitle: undefined,
           blocks: [],
-        })
+        }]
       }
-    }
-
-    if (days.length === 0) {
-      days = [{
-        id: 'd' + Date.now(),
-        dateLabel: `${today.getMonth() + 1}/${today.getDate()}`,
-        weekday: wk[today.getDay()],
-        weatherHint: '待定',
-        weatherIcon: '🌤️',
-        temperature: null,
-        subtitle: undefined,
-        blocks: [],
-      }]
     }
 
     const tripWithDay = { ...newTrip, days }
