@@ -25,6 +25,15 @@ export function useScrollCollapse() {
   const onScroll = useCallback((scrollTop: number) => {
     const y = Math.max(0, scrollTop)
 
+    // Guard: a large jump between consecutive scroll events means the scrollable
+    // content was replaced (day change). Reset internal state silently so stale
+    // lastY/accum from the previous day don't cause a false expand/collapse jitter.
+    if (Math.abs(y - lastY.current) > ACCUMULATOR_MAX) {
+      accum.current = 0
+      lastY.current = y
+      return
+    }
+
     // Top zone: always show toolbar, bypass settle
     if (y < TOP_ZONE) {
       setCollapsed(false)

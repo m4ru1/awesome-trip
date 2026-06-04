@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { coverMap } from './registry'
 
@@ -44,7 +44,10 @@ function CoverIcon({
     )
   }
 
-  const svgStr = mod.svg(coverColor || mod.meta.defaultColor)
+  const svgStr = useMemo(
+    () => mod.svg(coverColor || mod.meta.defaultColor),
+    [mod, coverColor],
+  )
 
   return (
     <span

@@ -145,7 +145,7 @@ export default function DayTimeline({
   }, [isMob])
 
   /* ── Day carousel (mobile) ── */
-  const { dragX, onTouchStart, onTouchMove, onTouchEnd, isSwipingRef } = useDayCarousel({
+  const { dragX, onTouchStart, onTouchMove, onTouchEnd, isSwipingRef, snapCtrlRef } = useDayCarousel({
     dayCount: trip.days.length,
     activeIdx,
     onSetActiveDay: onSetActiveDay ?? (() => {}),
@@ -159,7 +159,11 @@ export default function DayTimeline({
   /* ── Reset scroll + carousel position on day change ── */
   useLayoutEffect(() => {
     if (isMob) {
-      dragX.set(0)
+      // Don't reset dragX while a snap animation is in progress —
+      // useDayCarousel handles the transition from edge to center.
+      if (!snapCtrlRef.current) {
+        dragX.set(0)
+      }
       if (currentPanelRef.current) currentPanelRef.current.scrollTop = 0
     } else if (rubberRef.current) {
       rubberRef.current.scrollTop = 0
@@ -494,6 +498,7 @@ export default function DayTimeline({
         {/* Prev day panel */}
         {activeIdx > 0 && (
           <motion.div
+            key={`day-panel-${activeIdx - 1}`}
             className="overscroll-none"
             style={{
               position: 'absolute',
@@ -510,6 +515,7 @@ export default function DayTimeline({
 
         {/* Current day panel */}
         <motion.div
+          key={`day-panel-${activeIdx}`}
           ref={currentPanelRef}
           className="overscroll-none"
           style={{
@@ -527,6 +533,7 @@ export default function DayTimeline({
         {/* Next day panel */}
         {activeIdx < trip.days.length - 1 && (
           <motion.div
+            key={`day-panel-${activeIdx + 1}`}
             className="overscroll-none"
             style={{
               position: 'absolute',

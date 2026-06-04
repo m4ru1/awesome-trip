@@ -38,7 +38,7 @@ export default function ImageTile({ type, emoji, height = 96, radius = 14 }: Ima
       <span
         style={{
           fontSize: emojiSize,
-          filter: 'drop-shadow(0 3px 6px rgba(0,0,0,.12))',
+          textShadow: '0 3px 6px rgba(0,0,0,.12)',
         }}
       >
         {emoji || m.emoji}

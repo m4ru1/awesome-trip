@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, memo } from 'react'
 import { motion } from 'motion/react'
 import { useWheelRubberBand } from '@/hooks/useWheelRubberBand'
 import type { Trip } from '@/types'
@@ -8,6 +8,27 @@ import { parseTransportMin } from '@/utils/time'
 import ImageTile from '@/components/ui/ImageTile'
 import TypeTag from '@/components/ui/TypeTag'
 import CoverIcon from '@/components/covers/CoverIcon'
+
+interface Transport {
+  primary: { mode: string; duration: string; cost?: string } | null
+}
+
+const TransportSeparator = memo(function TransportSeparator({
+  transportToNext,
+}: {
+  transportToNext: Transport[]
+}) {
+  const segs = transportToNext.filter(t => t?.primary)
+  if (segs.length === 0) return null
+  const label = segs.length === 1
+    ? `${segs[0].primary!.duration} · ${segs[0].primary!.cost || '¥0'}`
+    : `${segs.map(t => (TRANSPORT_META[t.primary!.mode as keyof typeof TRANSPORT_META] ?? { emoji: '•' }).emoji).join('→')} ${segs.reduce((s, t) => s + parseTransportMin(t.primary!.duration), 0)}min`
+  return (
+    <div className="mx-auto my-1 flex items-center gap-1.5 text-[11px] text-ink2">
+      <span className="text-ink3">- -</span> {label}
+    </div>
+  )
+})
 
 interface Props {
   trip: Trip
@@ -25,7 +46,7 @@ interface Props {
   onScroll?: (scrollTop: number) => void
 }
 
-export default function ShareView({
+const ShareView = memo(function ShareView({
   trip, published, dirty, publishing, version, shareCode, nickname,
   onNicknameChange, onPublish, onSync, onRestore, onUnpublish,
   onScroll,
@@ -154,7 +175,10 @@ export default function ShareView({
                 const p = b.primary
                 return (
                   <div key={b.id}>
-                    <div className="flex gap-3 rounded-2xl bg-white p-3 shadow-soft" style={{ borderLeft: `5px solid ${m.color}` }}>
+                    <div
+                      className="flex gap-3 rounded-2xl bg-white p-3 shadow-soft"
+                      style={{ borderLeft: `5px solid ${m.color}`, contentVisibility: 'auto', containIntrinsicSize: 'auto 90px' }}
+                    >
                       <div className="h-[58px] w-[58px] shrink-0"><ImageTile type={b.type} emoji={p.emoji} height={58} radius={13} /></div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-[7px]">
@@ -174,18 +198,7 @@ export default function ShareView({
                         )}
                       </div>
                     </div>
-                    {b.transportToNext.length > 0 && (() => {
-                      const segs = b.transportToNext.filter(t => t?.primary)
-                      if (segs.length === 0) return null
-                      const label = segs.length === 1
-                        ? `${segs[0].primary.duration} · ${segs[0].primary.cost}`
-                        : `${segs.map(t => (TRANSPORT_META[t.primary.mode] ?? { emoji: '•' }).emoji).join('→')} ${segs.reduce((s, t) => s + parseTransportMin(t.primary.duration), 0)}min`
-                      return (
-                        <div className="mx-auto my-1 flex items-center gap-1.5 text-[11px] text-ink2">
-                          <span className="text-ink3">- -</span> {label}
-                        </div>
-                      )
-                    })()}
+                    <TransportSeparator transportToNext={b.transportToNext} />
                   </div>
                 )
               })}
@@ -207,4 +220,6 @@ export default function ShareView({
       </div>
     </motion.div>
   )
-}
+})
+
+export default ShareView

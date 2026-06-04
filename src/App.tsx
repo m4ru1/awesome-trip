@@ -189,8 +189,9 @@ export default function App() {
     try { if (!localStorage.getItem('tt_seen_help_v4')) setShowHelp(true) } catch { setShowHelp(true) }
   }, [])
 
-  // Reset toolbar collapse when switching modes, days, or toggling plan B
-  useEffect(() => { resetScrollCollapse() }, [mode, planB, activeDay, resetScrollCollapse])
+  // Reset toolbar collapse when switching modes or toggling plan B.
+  // Day-switching (swipe/tap) should NOT reset the bar — it stays collapsed.
+  useEffect(() => { resetScrollCollapse() }, [mode, planB, resetScrollCollapse])
 
   const closeHelp = useCallback(() => {
     setShowHelp(false)
@@ -749,7 +750,7 @@ export default function App() {
           )
         ) : (
         <>
-        <AnimatePresence mode="wait">
+        <AnimatePresence>
         {planB ? (
           <motion.div key="planB" className="h-full"
             initial={{ opacity: 0, y: 20 }}

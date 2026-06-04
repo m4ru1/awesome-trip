@@ -22,7 +22,7 @@ export function useDayCarousel({
 }: Opts) {
   const dragX = useMotionValue(0)
   const isSwipingRef = useRef(false)
-  const animatingRef = useRef(false)
+  const snapCtrlRef = useRef<ReturnType<typeof animate> | null>(null)
 
   const g = useRef({
     active: false,
@@ -32,7 +32,13 @@ export function useDayCarousel({
   })
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
-    if (animatingRef.current) return
+    // Cancel any running snap/bounce animation so the new gesture owns dragX
+    if (snapCtrlRef.current) {
+      snapCtrlRef.current.stop()
+      snapCtrlRef.current = null
+      dragX.set(0)
+    }
+
     const t = e.touches[0]
     const s = g.current
     s.active = true
@@ -42,7 +48,7 @@ export function useDayCarousel({
     s.lastX = t.clientX
     s.lastTime = Date.now()
     s.velocity = 0
-  }, [])
+  }, [dragX])
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     const s = g.current
@@ -89,6 +95,10 @@ export function useDayCarousel({
 
     const offset = dragX.get()
     const v = s.velocity
+
+    // Capture velocity before any mutation — it drives the spring's initial momentum
+    const velocityPxPerSec = v * 1000  // px/ms → px/s for framer-motion
+
     const threshold = containerWidth * SNAP_RATIO
 
     let targetIdx = activeIdx
@@ -101,17 +111,23 @@ export function useDayCarousel({
     const valid = targetIdx >= 0 && targetIdx < dayCount && targetIdx !== activeIdx
 
     if (valid && enabled) {
-      const tx = targetIdx < activeIdx ? containerWidth : -containerWidth
-      animatingRef.current = true
-      animate(dragX, tx, SNAP_SPRING).then(() => {
-        animatingRef.current = false
-        onSetActiveDay(targetIdx)
+      // Position panels at the continuity edge so the new current panel
+      // appears where the old adjacent panel was, then animate to center.
+      const continuityX = targetIdx < activeIdx
+        ? offset - containerWidth   // prev day: enter from left
+        : offset + containerWidth   // next day: enter from right
+
+      dragX.set(continuityX)
+      onSetActiveDay(targetIdx)
+
+      snapCtrlRef.current = animate(dragX, 0, {
+        ...SNAP_SPRING,
+        velocity: velocityPxPerSec,
       })
+      snapCtrlRef.current.then(() => { snapCtrlRef.current = null })
     } else if (enabled) {
-      animatingRef.current = true
-      animate(dragX, 0, BOUNCE_SPRING).then(() => {
-        animatingRef.current = false
-      })
+      snapCtrlRef.current = animate(dragX, 0, BOUNCE_SPRING)
+      snapCtrlRef.current.then(() => { snapCtrlRef.current = null })
     } else {
       dragX.set(0)
     }
@@ -121,5 +137,5 @@ export function useDayCarousel({
     setTimeout(() => { isSwipingRef.current = false }, 100)
   }, [activeIdx, dayCount, containerWidth, dragX, onSetActiveDay, enabled])
 
-  return { dragX, onTouchStart, onTouchMove, onTouchEnd, isSwipingRef }
+  return { dragX, onTouchStart, onTouchMove, onTouchEnd, isSwipingRef, snapCtrlRef }
 }
