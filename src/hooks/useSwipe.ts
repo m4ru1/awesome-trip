@@ -38,8 +38,8 @@ export function useSwipe({
     const dy = t.clientY - s.startY
 
     if (!s.axisLocked) {
-      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
-        s.axisLocked = Math.abs(dx) * 2 > Math.abs(dy) ? 'h' : 'v'
+      if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
+        s.axisLocked = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v'
       }
     }
 

@@ -122,6 +122,11 @@ export default function DayTimeline({
   const day = trip.days[activeIdx]
   if (!day) return null
 
+  // Reset scroll position when switching days
+  useEffect(() => {
+    if (rubberRef.current) rubberRef.current.scrollTop = 0
+  }, [activeIdx])
+
   const editable = mode === 'plan'
   const blocks = day.blocks
   // _transportBinder will be wired to TransportIndicator editing in a future pass
@@ -272,19 +277,19 @@ export default function DayTimeline({
         overflowY: 'auto',
         paddingBottom: 30,
         position: 'relative',
-        y: rubberY,
+        ...(isMob ? {} : { y: rubberY }),
       }}
       onScroll={onScroll ? (e) => onScroll(e.currentTarget.scrollTop) : undefined}
       {...touchHandlers}
     >
-      <AnimatePresence mode="popLayout" custom={swipeDir}>
+      <AnimatePresence mode="wait" custom={swipeDir}>
         <motion.div
           key={activeIdx}
           custom={swipeDir}
-          initial={isMob && enabled ? { x: swipeDir * 300, opacity: 0 } : false}
-          animate={{ x: 0, opacity: 1 }}
-          exit={isMob && enabled ? { x: swipeDir * -300, opacity: 0 } : undefined}
-          transition={{ type: 'spring', stiffness: 250, damping: 28 }}
+          initial={isMob && enabled ? { x: swipeDir * 300 } : false}
+          animate={{ x: 0 }}
+          exit={isMob && enabled ? { x: swipeDir * -300 } : undefined}
+          transition={{ type: 'spring', stiffness: 300, damping: 34 }}
         >
           {/* Execute mode: "Now" card at the top */}
           {mode === 'execute' && (
