@@ -48,7 +48,7 @@ export default function SettingsPanel({
         {/* Header */}
         <div className="title-cn mb-5 flex items-center justify-between">
           <span style={{ fontSize: 20, fontWeight: 800, color: 'var(--color-ink)' }}>设置</span>
-          <button onClick={onClose} className="btn btn-ghost h-8 w-8 !p-0 text-lg leading-none">&times;</button>
+          <button onClick={onClose} className="text-2xl leading-none opacity-50 hover:opacity-100 transition-opacity cursor-pointer" style={{ background: 'none', border: 'none' }}>&times;</button>
         </div>
 
         {/* Storage overview */}

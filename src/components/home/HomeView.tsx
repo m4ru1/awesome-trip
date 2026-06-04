@@ -40,7 +40,7 @@ export default function HomeView({ trips, onSelectTrip, onCreateTrip, onDeleteTr
         <span className="title-cn flex-1 text-[22px] font-extrabold text-ink max-[860px]:text-[18px]">旅行课程表</span>
         <span className="text-2xl">{'✈️'}</span>
         {onOpenSettings && (
-          <button onClick={onOpenSettings} className="btn btn-ghost h-9 w-9 !p-0 text-lg" title="设置">
+          <button onClick={onOpenSettings} className="text-2xl leading-none opacity-70 hover:opacity-100 transition-opacity cursor-pointer" title="设置" style={{ background: 'none', border: 'none' }}>
             {'⚙️'}
           </button>
         )}
