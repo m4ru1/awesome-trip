@@ -15,4 +15,10 @@ export default defineConfig({
       '/api': 'http://localhost:3000',
     },
   },
+  // @ts-ignore — vitest config injected at test time
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./vitest.setup.ts'],
+  },
 })
